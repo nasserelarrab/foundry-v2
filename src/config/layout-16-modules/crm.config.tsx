@@ -7,8 +7,8 @@ export const CRM_MODULE: Layout16ModuleConfig = {
   title: 'CRM',
   tooltip: 'CRM',
   icon: AddressBook,
-  path: '#',
-  rootPath: '#',
+  path: '/layout-16/modules/crm',
+  rootPath: '/layout-16/modules/crm',
   enabled: true,
   secondaryItems: [
     {

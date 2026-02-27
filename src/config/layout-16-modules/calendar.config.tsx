@@ -7,8 +7,8 @@ export const CALENDAR_MODULE: Layout16ModuleConfig = {
   title: 'Calendar',
   tooltip: 'Calinder',
   icon: CalendarAdd,
-  path: '#',
-  rootPath: '#',
+  path: '/layout-16/modules/calendar',
+  rootPath: '/layout-16/modules/calendar',
   enabled: true,
   secondaryItems: [
     {

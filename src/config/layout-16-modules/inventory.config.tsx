@@ -7,8 +7,8 @@ export const INVENTORY_MODULE: Layout16ModuleConfig = {
   title: 'Inventory',
   tooltip: 'Inventory',
   icon: Delivery2,
-  path: '#',
-  rootPath: '#',
+  path: '/layout-16/modules/inventory',
+  rootPath: '/layout-16/modules/inventory',
   enabled: true,
   secondaryItems: [
     {

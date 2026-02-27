@@ -74,11 +74,14 @@ export function LayoutProvider({ children, style: customStyle, bodyClassName = '
   }, [bodyClassName]);
 
   useEffect(() => {
+    console.log('pathname changed:', pathname);
     const moduleByPath = getLayout16ModuleByPath(pathname);
-    if (moduleByPath?.id && moduleByPath.id !== activeModuleId) {
+    console.log('moduleByPath:', moduleByPath);
+    if (moduleByPath?.id) {
+      console.log('setting activeModuleId to:', moduleByPath.id);
       setActiveModuleId(moduleByPath.id);
     }
-  }, [pathname, activeModuleId]);
+  }, [pathname]);
 
   return (
     <LayoutContext.Provider

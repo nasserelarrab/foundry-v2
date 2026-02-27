@@ -7,8 +7,8 @@ export const CMS_MODULE: Layout16ModuleConfig = {
   title: 'CMS',
   tooltip: 'CMS',
   icon: Document,
-  path: '#',
-  rootPath: '#',
+  path: '/layout-16/modules/cms',
+  rootPath: '/layout-16/modules/cms',
   enabled: true,
   secondaryItems: [
     {

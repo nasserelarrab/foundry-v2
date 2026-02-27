@@ -7,8 +7,8 @@ export const PM_MODULE: Layout16ModuleConfig = {
   title: 'Project Management',
   tooltip: 'Project Management',
   icon: Data,
-  path: '#',
-  rootPath: '#',
+  path: '/layout-16/modules/pm',
+  rootPath: '/layout-16/modules/pm',
   enabled: true,
   secondaryItems: [
     {
