@@ -1,0 +1,25 @@
+import { Fragment } from 'react';
+import { Container } from '@/components/common/container';
+import {
+  Toolbar,
+  ToolbarHeading,
+} from '@/layouts/layout-16/components/toolbar';
+
+interface Layout16ModuleBlankPageProps {
+  title: string;
+}
+
+export function Layout16ModuleBlankPage({ title }: Layout16ModuleBlankPageProps) {
+  return (
+    <Fragment>
+      <Container>
+        <Toolbar>
+          <ToolbarHeading title={title} description="" />
+        </Toolbar>
+      </Container>
+      <Container>
+        <div />
+      </Container>
+    </Fragment>
+  );
+}

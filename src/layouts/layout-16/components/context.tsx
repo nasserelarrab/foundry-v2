@@ -1,0 +1,116 @@
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState
+} from 'react';
+import { useLocation } from 'react-router-dom';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { getLayout16ModuleByPath } from '@/config/layout-16-modules';
+
+const HEADER_HEIGHT = "60px";
+const SIDEBAR_WIDTH = "300px";
+const SIDEBAR_COLLAPSED_WIDTH = "70px";
+const TOOLBAR_HEIGHT = "54px";
+
+// Define the shape of the layout state
+interface LayoutState {
+  style: React.CSSProperties;
+  bodyClassName: string;
+  isMobile: boolean;
+  isSidebarOpen: boolean;
+  sidebarToggle: () => void;
+  activeModuleId?: string;
+  setActiveModuleId: (id: string | undefined) => void;
+}
+
+// Create the context
+const LayoutContext = createContext<LayoutState | undefined>(undefined);
+
+// Provider component
+interface LayoutProviderProps {
+  children: ReactNode;
+  style?: React.CSSProperties;
+  bodyClassName?: string;
+}
+
+export function LayoutProvider({ children, style: customStyle, bodyClassName = '' }: LayoutProviderProps) {
+  const { pathname } = useLocation();
+  const isMobile = useIsMobile();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [activeModuleId, setActiveModuleId] = useState<string | undefined>(undefined);
+
+  const defaultStyle: React.CSSProperties = {
+    '--sidebar-width': SIDEBAR_WIDTH,
+    '--sidebar-collapsed-width': SIDEBAR_COLLAPSED_WIDTH,
+    '--header-height': HEADER_HEIGHT,
+    '--toolbar-height': TOOLBAR_HEIGHT,
+  } as React.CSSProperties;
+
+  const style: React.CSSProperties = {
+    ...defaultStyle,
+    ...customStyle,
+  };
+
+  // Sidebar toggle function
+  const sidebarToggle = () => setIsSidebarOpen((open) => !open);
+
+  // Set body className on mount and clean up on unmount
+  useEffect(() => {
+    if (bodyClassName) {
+      const body = document.body;
+      const existingClasses = body.className;
+
+      // Add new classes
+      body.className = `${existingClasses} ${bodyClassName}`.trim();
+
+      // Cleanup function to remove classes on unmount
+      return () => {
+        body.className = existingClasses;
+      };
+    }
+  }, [bodyClassName]);
+
+  useEffect(() => {
+    const moduleByPath = getLayout16ModuleByPath(pathname);
+    if (moduleByPath?.id && moduleByPath.id !== activeModuleId) {
+      setActiveModuleId(moduleByPath.id);
+    }
+  }, [pathname, activeModuleId]);
+
+  return (
+    <LayoutContext.Provider
+      value={{
+        bodyClassName,
+        style,
+        isMobile,
+        isSidebarOpen,
+        sidebarToggle,
+        activeModuleId,
+        setActiveModuleId,
+      }}
+    >
+      <div
+        data-slot="layout-wrapper"
+        className="flex grow"
+        data-sidebar-open={isSidebarOpen}
+        style={style}
+      >
+        <TooltipProvider delayDuration={0}>
+          {children}
+        </TooltipProvider>
+      </div>
+    </LayoutContext.Provider>
+  );
+}
+
+// Custom hook for consuming the context
+export const useLayout = () => {
+  const context = useContext(LayoutContext);
+  if (!context) {
+    throw new Error('useLayout must be used within a LayoutProvider');
+  }
+  return context;
+};
