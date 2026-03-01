@@ -47,6 +47,18 @@ const cardHeaderVariants = cva('flex items-center justify-between flex-wrap px-5
   },
 });
 
+const cardHeaderFoundryVariants = cva('flex items-center justify-between flex-wrap px-5 min-h-14 gap-2.5', {
+  variants: {
+    variant: {
+      default: 'border-b border-border',
+      accent: '',
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
+});
+
 const cardContentVariants = cva('grow p-5', {
   variants: {
     variant: {
@@ -71,7 +83,30 @@ const cardTableVariants = cva('grid grow', {
   },
 });
 
-const cardFooterVariants = cva('flex items-center px-5 min-h-14', {
+const FoundrycardTableVariants = cva('grid grow pl-5 pr-5 pt-4', {
+  variants: {
+    variant: {
+      default: '',
+      accent: 'bg-card rounded-xl ',
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
+});
+const cardFooterVariants = cva('flex items-center px-5 min-h-14 ', {
+  variants: {
+    variant: {
+      default: 'border-t border-border',
+      accent: 'bg-card rounded-b-xl mt-[2px]',
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
+});
+
+const FoundrycardFooterVariants = cva('flex items-center min-h-14 ml-4 mr-4', {
   variants: {
     variant: {
       default: 'border-t border-border',
@@ -102,6 +137,12 @@ function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement
   return <div data-slot="card-header" className={cn(cardHeaderVariants({ variant }), className)} {...props} />;
 }
 
+// CardHeader Component
+function cardHeaderFoundry({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  const { variant } = useCardContext();
+  return <div data-slot="card-header-foundry" className={cn(cardHeaderFoundryVariants({ variant }), className)} {...props} />;
+}
+
 // CardContent Component
 function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   const { variant } = useCardContext();
@@ -113,13 +154,22 @@ function CardTable({ className, ...props }: React.HTMLAttributes<HTMLDivElement>
   const { variant } = useCardContext();
   return <div data-slot="card-table" className={cn(cardTableVariants({ variant }), className)} {...props} />;
 }
-
+// CardTable Component
+function FoundryCardTable({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  const { variant } = useCardContext();
+  return <div data-slot="foundry-card-table" className={cn(FoundrycardTableVariants({ variant }), className)} {...props} />;
+}
 // CardFooter Component
 function CardFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   const { variant } = useCardContext();
   return <div data-slot="card-footer" className={cn(cardFooterVariants({ variant }), className)} {...props} />;
 }
 
+
+function FoundryCardFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  const { variant } = useCardContext();
+  return <div data-slot="foundry-card-footer" className={cn(FoundrycardFooterVariants({ variant }), className)} {...props} />;
+}
 // Other Components
 function CardHeading({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return <div data-slot="card-heading" className={cn('space-y-1', className)} {...props} />;
@@ -144,4 +194,4 @@ function CardDescription({ className, ...props }: React.HTMLAttributes<HTMLDivEl
 }
 
 // Exports
-export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardHeading, CardTable, CardTitle, CardToolbar };
+export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardHeading, CardTable, CardTitle, CardToolbar,cardHeaderFoundry,FoundryCardTable,FoundryCardFooter };

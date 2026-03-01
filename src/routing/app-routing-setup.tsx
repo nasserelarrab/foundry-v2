@@ -44,6 +44,7 @@ import {
 } from '@/pages/auth';
 import { DefaultPage, Demo1DarkSidebarPage } from '@/pages/dashboards';
 import {
+  PagesList,
   Layout16Bookkeeping1Page,
   Layout16BookkeepingPage,
   Layout16Calendar1Page,
@@ -65,7 +66,7 @@ import {
   Layout16MarketingPage,
   Layout16Pm1Page,
   Layout16PmPage,
-} from '@/pages/modules/layout-16-modules';
+} from '@/pages/modules';
 import {
   NetworkAppRosterPage,
   NetworkAuthorPage,
@@ -123,12 +124,13 @@ export function AppRoutingSetup() {
       
         <Route element={<Layout16 />}>
           <Route path="/" element={<DefaultPage />} />
+          <Route path="/cms/pages/list" element={<PagesList />} />
+          ////////testing///////////////////
           <Route path="/dark-sidebar" element={<Demo1DarkSidebarPage />} />
           <Route path="/layout-16/modules/calendar" element={<Layout16CalendarPage />} />
           <Route path="/layout-16/modules/calendar/calendar1" element={<Layout16Calendar1Page />} />
           <Route path="/layout-16/modules/calendar/calendar2" element={<Layout16Calendar2Page />} />
           <Route path="/layout-16/modules/cms" element={<Layout16CmsPage />} />
-          <Route path="/layout-16/modules/cms/cms1" element={<Layout16Cms1Page />} />
           <Route path="/layout-16/modules/cms/cms2" element={<Layout16Cms2Page />} />
           <Route path="/layout-16/modules/cms/cms3" element={<Layout16Cms3Page />} />
           <Route path="/layout-16/modules/ecommerce" element={<Layout16EcommercePage />} />

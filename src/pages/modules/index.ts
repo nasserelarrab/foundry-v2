@@ -3,7 +3,8 @@ export * from './calendar/calendar1/calendar1-page';
 export * from './calendar/calendar2/calendar2-page';
 
 export * from './cms/cms-page';
-export * from './cms/cms1/cms1-page';
+export * from './cms/pages/pages-list';
+
 export * from './cms/cms2/cms2-page';
 export * from './cms/cms3/cms3-page';
 
