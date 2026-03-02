@@ -379,15 +379,27 @@ function DataGridTableLoader() {
   );
 }
 
-function DataGridTableRowSelect<TData>({ row, size }: { row: Row<TData>; size?: 'sm' | 'md' | 'lg' }) {
+function DataGridTableRowSelect<TData>({
+  row,
+  size,
+  disabled = false,
+}: {
+  row: Row<TData>;
+  size?: 'sm' | 'md' | 'lg';
+  disabled?: boolean;
+}) {
   return (
     <>
       <div
-        className={cn('hidden absolute top-0 bottom-0 start-0 w-[2px] bg-primary', row.getIsSelected() && 'block')}
+        className={cn(
+          'hidden absolute top-0 bottom-0 start-0 w-[2px] bg-primary',
+          !disabled && row.getIsSelected() && 'block',
+        )}
       ></div>
       <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        checked={disabled ? false : row.getIsSelected()}
+        onCheckedChange={(value) => !disabled && row.toggleSelected(!!value)}
+        disabled={disabled}
         aria-label="Select row"
         size={size ?? 'sm'}
         className="align-[inherit]"
@@ -396,14 +408,20 @@ function DataGridTableRowSelect<TData>({ row, size }: { row: Row<TData>; size?: 
   );
 }
 
-function DataGridTableRowSelectAll({ size }: { size?: 'sm' | 'md' | 'lg' }) {
+function DataGridTableRowSelectAll({
+  size,
+  disabled = false,
+}: {
+  size?: 'sm' | 'md' | 'lg';
+  disabled?: boolean;
+}) {
   const { table, recordCount, isLoading } = useDataGrid();
 
   return (
     <Checkbox
-      checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
-      disabled={isLoading || recordCount === 0}
-      onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+      checked={disabled ? false : table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
+      disabled={disabled || isLoading || recordCount === 0}
+      onCheckedChange={(value) => !disabled && table.toggleAllPageRowsSelected(!!value)}
       aria-label="Select all"
       size={size}
       className="align-[inherit]"

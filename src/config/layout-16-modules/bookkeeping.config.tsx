@@ -7,8 +7,8 @@ export const BOOKKEEPING_MODULE: Layout16ModuleConfig = {
   title: 'Bookkeeping',
   tooltip: 'Bookkeeping',
   icon: GroupMinus,
-  path: '#',
-  rootPath: '#',
+  path: '/layout-16/modules/bookkeeping',
+  rootPath: '/layout-16/modules/bookkeeping',
   enabled: true,
   secondaryItems: [
     {

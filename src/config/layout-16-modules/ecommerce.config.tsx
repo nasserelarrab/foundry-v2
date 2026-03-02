@@ -7,8 +7,8 @@ export const ECOMMERCE_MODULE: Layout16ModuleConfig = {
   title: 'E-commerce',
   tooltip: 'E-commerce',
   icon: Shop,
-  path: '#',
-  rootPath: '#',
+  path: '/layout-16/modules/ecommerce',
+  rootPath: '/layout-16/modules/ecommerce',
   enabled: true,
   secondaryItems: [
     {

@@ -15,10 +15,16 @@ export function SidebarPrimaryMenu() {
   const { activeModuleId } = useLayout();
 
   const modulePrimaryItems = useMemo(() => {
+    console.log('activeModuleId in SidebarPrimaryMenu:', activeModuleId);
     const moduleConfig = getLayout16ModuleById(activeModuleId);
-    return (
-      moduleConfig?.secondaryItems.filter((x) => x.section === 'primary') ?? []
-    );
+    console.log('moduleConfig:', moduleConfig);
+    console.log('secondaryItems:', moduleConfig?.secondaryItems);
+    const filtered = moduleConfig?.secondaryItems.filter((x) => {
+      console.log('item:', x.title, 'section:', x.section);
+      return x.section === 'primary';
+    }) ?? [];
+    console.log('filtered primary items:', filtered);
+    return filtered;
   }, [activeModuleId]);
 
   // Memoize matchPath to prevent unnecessary re-renders

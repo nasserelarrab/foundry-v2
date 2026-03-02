@@ -40,7 +40,11 @@ export function LayoutProvider({ children, style: customStyle, bodyClassName = '
   const { pathname } = useLocation();
   const isMobile = useIsMobile();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [activeModuleId, setActiveModuleId] = useState<string | undefined>(undefined);
+  // initialize with module from current path or default to CMS
+  const [activeModuleId, setActiveModuleId] = useState<string | undefined>(() => {
+    const m = getLayout16ModuleByPath(pathname);
+    return m?.id || 'cms';
+  });
 
   const defaultStyle: React.CSSProperties = {
     '--sidebar-width': SIDEBAR_WIDTH,
@@ -74,11 +78,14 @@ export function LayoutProvider({ children, style: customStyle, bodyClassName = '
   }, [bodyClassName]);
 
   useEffect(() => {
+    // each time the location changes we try to resolve a module;
+    // if none matches (e.g. root path) we fall back to CMS so a menu
+    // is always shown on initial render
+    console.log('pathname changed:', pathname);
     const moduleByPath = getLayout16ModuleByPath(pathname);
-    if (moduleByPath?.id && moduleByPath.id !== activeModuleId) {
-      setActiveModuleId(moduleByPath.id);
-    }
-  }, [pathname, activeModuleId]);
+    console.log('moduleByPath:', moduleByPath);
+    setActiveModuleId(moduleByPath?.id ?? 'cms');
+  }, [pathname]);
 
   return (
     <LayoutContext.Provider

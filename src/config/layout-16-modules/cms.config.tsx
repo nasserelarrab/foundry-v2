@@ -1,22 +1,47 @@
-import { Document } from '@/components/icons';
-import type { Layout16ModuleConfig } from './types';
-import { FileText, Folder, Users, Sparkles } from 'lucide-react';
 
+import type { Layout16ModuleConfig } from './types';
+import { FileText, Users, Sparkles } from 'lucide-react';
+import { 
+  BurgerMenu,
+  ChartLineStar,
+  Element7,
+  Element12,
+  ElementEqual,
+  Document,
+  Folder,
+  Frame,
+  GamerCards,
+  GamerStars,
+  Grid,
+  Home,
+  MessageText2,
+  Messages,
+  NotificationStatus,
+  Pencil,
+  Plus,
+  Rocket,
+  Save2,
+  Setting2,
+  StatusOnline,
+  TabletTextDown,
+  Technology4,
+  TextCircle,
+  Up, } from '@/components/icons';
 export const CMS_MODULE: Layout16ModuleConfig = {
   id: 'cms',
   title: 'CMS',
   tooltip: 'CMS',
   icon: Document,
-  path: '#',
-  rootPath: '#',
+  path: '/layout-16/modules/cms',
+  rootPath: '/layout-16/modules/cms',
   enabled: true,
   secondaryItems: [
     {
-      id: 'cms-1',
-      title: 'CMS1',
-      path: '#',
+      id: 'Pages',
+      title: 'Pages',
+      path: '/cms/pages/list',
       section: 'primary',
-      icon: FileText,
+      icon: Document,
       enabled: true,
     },
     {

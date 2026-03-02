@@ -7,8 +7,8 @@ export const HR_MODULE: Layout16ModuleConfig = {
   title: 'Human Resources',
   tooltip: 'Human Resources',
   icon: People,
-  path: '#',
-  rootPath: '#',
+  path: '/layout-16/modules/hr',
+  rootPath: '/layout-16/modules/hr',
   enabled: true,
   secondaryItems: [
     {

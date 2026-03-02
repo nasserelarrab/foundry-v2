@@ -22,8 +22,10 @@ export const LAYOUT16_MODULES: Layout16ModuleConfig[] = [
   PM_MODULE,
 ];
 
-export const getLayout16ModuleById = (id: string | undefined) =>
-  LAYOUT16_MODULES.find((m) => m.id === id);
+export const getLayout16ModuleById = (id: string | undefined) => {
+  return LAYOUT16_MODULES.find((m) => m.id === id);
+}
+  
 
 export const getLayout16ModuleByPath = (pathname: string) =>
   LAYOUT16_MODULES.find(

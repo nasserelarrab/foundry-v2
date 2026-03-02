@@ -7,8 +7,8 @@ export const MARKETING_MODULE: Layout16ModuleConfig = {
   title: 'Marketing',
   tooltip: 'Marketing',
   icon: GraphUp,
-  path: '#',
-  rootPath: '#',
+  path: '/layout-16/modules/marketing',
+  rootPath: '/layout-16/modules/marketing',
   enabled: true,
   secondaryItems: [
     {
