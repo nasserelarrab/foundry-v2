@@ -1,7 +1,7 @@
 import { AuthRouting } from '@/auth/auth-routing';
 import { RequireAuth } from '@/auth/require-auth';
 import { ErrorRouting } from '@/errors/error-routing';
-import { Layout16} from '@/layouts/layout-16/index';
+import { Layout16 } from '@/layouts/layout-16/index';
 import {
   AccountActivityPage,
   AccountAllowedIPAddressesPage,
@@ -44,7 +44,6 @@ import {
 } from '@/pages/auth';
 import { DefaultPage, Demo1DarkSidebarPage } from '@/pages/dashboards';
 import {
-  PagesList,
   Layout16Bookkeeping1Page,
   Layout16BookkeepingPage,
   Layout16Calendar1Page,
@@ -66,6 +65,7 @@ import {
   Layout16MarketingPage,
   Layout16Pm1Page,
   Layout16PmPage,
+  PagesList,
 } from '@/pages/modules';
 import {
   NetworkAppRosterPage,
@@ -121,32 +121,80 @@ import { Navigate, Route, Routes } from 'react-router';
 export function AppRoutingSetup() {
   return (
     <Routes>
-      
+      <Route element={<RequireAuth />}>
         <Route element={<Layout16 />}>
           <Route path="/" element={<DefaultPage />} />
           <Route path="/cms/pages/list" element={<PagesList />} />
           ////////testing///////////////////
           <Route path="/dark-sidebar" element={<Demo1DarkSidebarPage />} />
-          <Route path="/layout-16/modules/calendar" element={<Layout16CalendarPage />} />
-          <Route path="/layout-16/modules/calendar/calendar1" element={<Layout16Calendar1Page />} />
-          <Route path="/layout-16/modules/calendar/calendar2" element={<Layout16Calendar2Page />} />
+          <Route
+            path="/layout-16/modules/calendar"
+            element={<Layout16CalendarPage />}
+          />
+          <Route
+            path="/layout-16/modules/calendar/calendar1"
+            element={<Layout16Calendar1Page />}
+          />
+          <Route
+            path="/layout-16/modules/calendar/calendar2"
+            element={<Layout16Calendar2Page />}
+          />
           <Route path="/layout-16/modules/cms" element={<Layout16CmsPage />} />
-          <Route path="/layout-16/modules/cms/cms2" element={<Layout16Cms2Page />} />
-          <Route path="/layout-16/modules/cms/cms3" element={<Layout16Cms3Page />} />
-          <Route path="/layout-16/modules/ecommerce" element={<Layout16EcommercePage />} />
-          <Route path="/layout-16/modules/ecommerce/ecommerce1" element={<Layout16Ecommerce1Page />} />
-          <Route path="/layout-16/modules/bookkeeping" element={<Layout16BookkeepingPage />} />
-          <Route path="/layout-16/modules/bookkeeping/bookkeeping1" element={<Layout16Bookkeeping1Page />} />
-          <Route path="/layout-16/modules/inventory" element={<Layout16InventoryPage />} />
-          <Route path="/layout-16/modules/inventory/inventory1" element={<Layout16Inventory1Page />} />
+          <Route
+            path="/layout-16/modules/cms/cms2"
+            element={<Layout16Cms2Page />}
+          />
+          <Route
+            path="/layout-16/modules/cms/cms3"
+            element={<Layout16Cms3Page />}
+          />
+          <Route
+            path="/layout-16/modules/ecommerce"
+            element={<Layout16EcommercePage />}
+          />
+          <Route
+            path="/layout-16/modules/ecommerce/ecommerce1"
+            element={<Layout16Ecommerce1Page />}
+          />
+          <Route
+            path="/layout-16/modules/bookkeeping"
+            element={<Layout16BookkeepingPage />}
+          />
+          <Route
+            path="/layout-16/modules/bookkeeping/bookkeeping1"
+            element={<Layout16Bookkeeping1Page />}
+          />
+          <Route
+            path="/layout-16/modules/inventory"
+            element={<Layout16InventoryPage />}
+          />
+          <Route
+            path="/layout-16/modules/inventory/inventory1"
+            element={<Layout16Inventory1Page />}
+          />
           <Route path="/layout-16/modules/hr" element={<Layout16HrPage />} />
-          <Route path="/layout-16/modules/hr/hr1" element={<Layout16Hr1Page />} />
+          <Route
+            path="/layout-16/modules/hr/hr1"
+            element={<Layout16Hr1Page />}
+          />
           <Route path="/layout-16/modules/crm" element={<Layout16CrmPage />} />
-          <Route path="/layout-16/modules/crm/crm1" element={<Layout16Crm1Page />} />
-          <Route path="/layout-16/modules/marketing" element={<Layout16MarketingPage />} />
-          <Route path="/layout-16/modules/marketing/marketing1" element={<Layout16Marketing1Page />} />
+          <Route
+            path="/layout-16/modules/crm/crm1"
+            element={<Layout16Crm1Page />}
+          />
+          <Route
+            path="/layout-16/modules/marketing"
+            element={<Layout16MarketingPage />}
+          />
+          <Route
+            path="/layout-16/modules/marketing/marketing1"
+            element={<Layout16Marketing1Page />}
+          />
           <Route path="/layout-16/modules/pm" element={<Layout16PmPage />} />
-          <Route path="/layout-16/modules/pm/pm1" element={<Layout16Pm1Page />} />
+          <Route
+            path="/layout-16/modules/pm/pm1"
+            element={<Layout16Pm1Page />}
+          />
           <Route
             path="/public-profile/profiles/default/"
             element={<ProfileDefaultPage />}
@@ -427,6 +475,7 @@ export function AppRoutingSetup() {
           />
           <Route path="/auth/get-started" element={<AccountGetStartedPage />} />
         </Route>
+      </Route>
 
       <Route path="error/*" element={<ErrorRouting />} />
       <Route path="auth/*" element={<AuthRouting />} />
