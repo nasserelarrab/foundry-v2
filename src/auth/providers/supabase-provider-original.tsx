@@ -4,64 +4,19 @@ import { AuthContext } from '@/auth/context/auth-context';
 import * as authHelper from '@/auth/lib/helpers';
 import { AuthModel, UserModel } from '@/auth/lib/models';
 
+// Define the Supabase Auth Provider
 export function AuthProvider({ children }: PropsWithChildren) {
-  const DEV_BYPASS = import.meta.env.VITE_DEV_BYPASS_AUTH === 'true';
-
   const [loading, setLoading] = useState(true);
   const [auth, setAuth] = useState<AuthModel | undefined>(authHelper.getAuth());
   const [currentUser, setCurrentUser] = useState<UserModel | undefined>();
   const [isAdmin, setIsAdmin] = useState(false);
 
-  // ✅ DEV MODE BYPASS
-  useEffect(() => {
-    if (DEV_BYPASS) {
-      const fakeAuth: AuthModel = {
-        access_token: 'dev-access-token',
-        refresh_token: 'dev-refresh-token',
-      };
-
-      const fakeUser: UserModel = {
-        username: 'devuser',
-        email: 'dev@local.com',
-        first_name: 'Dev',
-        last_name: 'User',
-        fullname: 'Dev User',
-        email_verified: true,
-        occupation: 'Frontend Developer',
-        company_name: 'Local Dev Co',
-        phone: '+200000000000',
-        roles: [1],
-        pic: '',
-        language: 'en',
-        is_admin: true,
-      };
-
-      setAuth(fakeAuth);
-      setCurrentUser(fakeUser);
-      setIsAdmin(true);
-      setLoading(false);
-
-      return;
-    }
-  }, [DEV_BYPASS]);
-
-  // Admin check
+  // Check if user is admin
   useEffect(() => {
     setIsAdmin(currentUser?.is_admin === true);
   }, [currentUser]);
 
-  const saveAuth = (auth: AuthModel | undefined) => {
-    setAuth(auth);
-    if (auth) {
-      authHelper.setAuth(auth);
-    } else {
-      authHelper.removeAuth();
-    }
-  };
-
   const verify = async () => {
-    if (DEV_BYPASS) return;
-
     if (auth) {
       try {
         const user = await getUser();
@@ -73,9 +28,16 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
   };
 
-  const login = async (email: string, password: string) => {
-    if (DEV_BYPASS) return;
+  const saveAuth = (auth: AuthModel | undefined) => {
+    setAuth(auth);
+    if (auth) {
+      authHelper.setAuth(auth);
+    } else {
+      authHelper.removeAuth();
+    }
+  };
 
+  const login = async (email: string, password: string) => {
     try {
       const auth = await SupabaseAdapter.login(email, password);
       saveAuth(auth);
@@ -94,8 +56,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
     firstName?: string,
     lastName?: string,
   ) => {
-    if (DEV_BYPASS) return;
-
     try {
       const auth = await SupabaseAdapter.register(
         email,
@@ -114,7 +74,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
   };
 
   const requestPasswordReset = async (email: string) => {
-    if (DEV_BYPASS) return;
     await SupabaseAdapter.requestPasswordReset(email);
   };
 
@@ -122,36 +81,23 @@ export function AuthProvider({ children }: PropsWithChildren) {
     password: string,
     password_confirmation: string,
   ) => {
-    if (DEV_BYPASS) return;
     await SupabaseAdapter.resetPassword(password, password_confirmation);
   };
 
   const resendVerificationEmail = async (email: string) => {
-    if (DEV_BYPASS) return;
     await SupabaseAdapter.resendVerificationEmail(email);
   };
 
   const getUser = async () => {
-    if (DEV_BYPASS) return currentUser;
     return await SupabaseAdapter.getCurrentUser();
   };
 
   const updateProfile = async (userData: Partial<UserModel>) => {
-    if (DEV_BYPASS) {
-      setCurrentUser((prev) => ({
-        ...prev!,
-        ...userData,
-      }));
-      return;
-    }
-
     return await SupabaseAdapter.updateUserProfile(userData);
   };
 
   const logout = () => {
-    if (!DEV_BYPASS) {
-      SupabaseAdapter.logout();
-    }
+    SupabaseAdapter.logout();
     saveAuth(undefined);
     setCurrentUser(undefined);
   };
