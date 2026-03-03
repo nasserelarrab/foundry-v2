@@ -50,7 +50,7 @@ const cardHeaderVariants = cva('flex items-center justify-between flex-wrap px-5
 const cardHeaderFoundryVariants = cva('flex items-center justify-between flex-wrap px-5 min-h-14 gap-2.5', {
   variants: {
     variant: {
-      default: 'border-b border-border',
+      default: ' border-border',
       accent: '',
     },
   },
@@ -138,7 +138,7 @@ function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement
 }
 
 // CardHeader Component
-function cardHeaderFoundry({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+function CardHeaderFoundry({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   const { variant } = useCardContext();
   return <div data-slot="card-header-foundry" className={cn(cardHeaderFoundryVariants({ variant }), className)} {...props} />;
 }
@@ -194,4 +194,4 @@ function CardDescription({ className, ...props }: React.HTMLAttributes<HTMLDivEl
 }
 
 // Exports
-export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardHeading, CardTable, CardTitle, CardToolbar,cardHeaderFoundry,FoundryCardTable,FoundryCardFooter };
+export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardHeading, CardTable, CardTitle, CardToolbar, CardHeaderFoundry, FoundryCardTable, FoundryCardFooter };

@@ -1,0 +1,108 @@
+[
+  {
+    "id": "1",
+    "title": "Home - Main English",
+    "path": "/",
+    "lang": "EN",
+    "type": "Basic",
+    "status": "Published",
+    "seo": { "label": "GOOD", "score": 92, "example": "\"Modern Furniture\"" },
+    "updated": { "user": "Ahmed", "time": "2 hours ago" },
+    "publication": "Published",
+    "blocks": 12
+  },
+  {
+    "id": "2",
+    "title": "About Our Mission",
+    "path": "/about-us",
+    "lang": "EN",
+    "type": "Basic",
+    "status": "Published",
+    "seo": { "label": "GOOD", "score": 85, "example": "\"Our Story\"" },
+    "updated": { "user": "Sarah K.", "time": "5 hours ago" },
+    "publication": "Published",
+    "blocks": 5
+  },
+  {
+    "id": "3",
+    "title": "Summer Collection 2024",
+    "path": "/summer-collection",
+    "lang": "EN",
+    "type": "Landing",
+    "seo": { "label": "BAD", "score": 45, "example": "\"Summer Trends\"" },
+    "updated": { "user": "Ahmed", "time": "2 days ago" },
+    "publication": "Scheduled",
+    "blocks": 3
+  },
+  {
+    "id": "3-1",
+    "parentId": "3",
+    "title": "Landing",
+    "path": "/summer-collection/landing",
+    "lang": "EN",
+    "type": "Landing",
+    "status": "Scheduled",
+    "seo": { "label": "BAD", "score": 45 },
+    "publication": "Scheduled"
+  },
+  {
+    "id": "4",
+    "title": "About Us - عن نحن",
+    "path": "/about-us-ar",
+    "lang": "AR",
+    "type": "Content",
+    "status": "Draft",
+    "seo": { "label": "BAD", "score": 12, "example": "\"عن نحن\"" },
+    "updated": { "user": "Layla M.", "time": "3 hours ago" },
+    "publication": "Draft",
+    "blocks": 2
+  },
+  {
+    "id": "5",
+    "title": "Team Members",
+    "path": "/about-us/team",
+    "lang": "EN",
+    "type": "Staff",
+    "status": "Published",
+    "seo": { "label": "OK", "score": 78, "example": "\"Management Team\"" },
+    "updated": { "user": "Sarah K.", "time": "1 week ago" },
+    "publication": "Published",
+    "blocks": 8
+  },
+  {
+    "id": "6",
+    "title": "Contact",
+    "path": "/contact",
+    "lang": "EN",
+    "type": "Form",
+    "status": "Published",
+    "seo": { "label": "GOOD", "score": 88 },
+    "updated": { "user": "Ahmed", "time": "1 day ago" },
+    "publication": "Published",
+    "blocks": 4
+  },
+  {
+    "id": "7",
+    "title": "Blog",
+    "path": "/blog",
+    "lang": "EN",
+    "type": "Landing",
+    "status": "Published",
+    "seo": { "label": "OK", "score": 70 },
+    "updated": { "user": "Maria", "time": "3 days ago" },
+    "publication": "Published",
+    "blocks": 9
+  },
+  {
+    "id": "8",
+    "title": "FAQ",
+    "path": "/faq",
+    "lang": "EN",
+    "type": "Basic",
+    "status": "Published",
+    "seo": { "label": "GOOD", "score": 95 },
+    "updated": { "user": "Nasser", "time": "5 hours ago" },
+    "publication": "Published",
+    "blocks": 2
+  }
+]
