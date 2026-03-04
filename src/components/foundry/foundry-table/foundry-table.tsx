@@ -35,6 +35,8 @@ export interface FoundryTableProps<T = any> {
   rowIdField?: string;
   /** Show checkbox column for row selection */
   showCheckbox?: boolean;
+  /** Show actions cell column */
+  showActionsCell?: boolean;
   /** Default pagination state */
   defaultPagination?: PaginationState;
   /** Default sorting state */
@@ -60,6 +62,7 @@ const FoundryTable = <T extends Record<string, any>>({
   data,
   rowIdField = 'id',
   showCheckbox = false,
+  showActionsCell = true,
   defaultPagination = { pageIndex: 0, pageSize: 10 },
   defaultSorting = [{ id: 'title', desc: false }],
   ActionsCell,
@@ -127,8 +130,8 @@ const FoundryTable = <T extends Record<string, any>>({
     // Add dynamic columns from config
     const configColumns = buildColumnsFromConfig(columnConfig) as ColumnDef<T>[];
     
-    // Add actions column if ActionsCell is provided
-    if (ActionsCell) {
+    // Add actions column if ActionsCell is provided and showActionsCell is true
+    if (ActionsCell && showActionsCell) {
       configColumns.push({
         id: 'actions',
         header: 'Actions',
@@ -143,7 +146,7 @@ const FoundryTable = <T extends Record<string, any>>({
     }
 
     return base.concat(configColumns);
-  }, [columnConfig, showCheckbox, rowIdField, ActionsCell]);
+  }, [columnConfig, showCheckbox, rowIdField, ActionsCell, showActionsCell]);
 
   const table = useReactTable({
     columns,

@@ -49,7 +49,6 @@ import {
   Layout16Calendar1Page,
   Layout16Calendar2Page,
   Layout16CalendarPage,
-  Layout16Cms1Page,
   Layout16Cms2Page,
   Layout16Cms3Page,
   Layout16CmsPage,
@@ -121,7 +120,7 @@ import { Navigate, Route, Routes } from 'react-router';
 export function AppRoutingSetup() {
   return (
     <Routes>
-      <Route element={<RequireAuth />}>
+      {/* <Route element={<RequireAuth />}> */}
         <Route element={<Layout16 />}>
           <Route path="/" element={<DefaultPage />} />
           <Route path="/cms/pages/list" element={<PagesList />} />
@@ -474,7 +473,7 @@ export function AppRoutingSetup() {
             element={<AllProductsPage />}
           />
           <Route path="/auth/get-started" element={<AccountGetStartedPage />} />
-        </Route>
+        {/* </Route> */}
       </Route>
 
       <Route path="error/*" element={<ErrorRouting />} />

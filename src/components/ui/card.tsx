@@ -22,8 +22,8 @@ const useCardContext = () => {
   return context;
 };
 
-// Variants
-const cardVariants = cva('flex flex-col items-stretch text-card-foreground rounded-xl', {
+// Variants type rounded-xl for rounded 
+const cardVariants = cva('flex flex-col items-stretch text-card-foreground ', {
   variants: {
     variant: {
       default: 'bg-card border border-border shadow-xs black/5',
@@ -46,8 +46,8 @@ const cardHeaderVariants = cva('flex items-center justify-between flex-wrap px-5
     variant: 'default',
   },
 });
-
-const cardHeaderFoundryVariants = cva('flex items-center justify-between flex-wrap px-5 min-h-14 gap-2.5', {
+//px-5
+const cardHeaderFoundryVariants = cva('flex items-center justify-between flex-wrap  min-h-14 gap-2.5', {
   variants: {
     variant: {
       default: ' border-border',
@@ -82,8 +82,8 @@ const cardTableVariants = cva('grid grow', {
     variant: 'default',
   },
 });
-
-const FoundrycardTableVariants = cva('grid grow pl-5 pr-5 pt-4', {
+//pl-5 pr-5 pt-4
+const FoundrycardTableVariants = cva('grid grow ', {
   variants: {
     variant: {
       default: '',
@@ -105,8 +105,8 @@ const cardFooterVariants = cva('flex items-center px-5 min-h-14 ', {
     variant: 'default',
   },
 });
-
-const FoundrycardFooterVariants = cva('flex items-center min-h-14 ml-4 mr-4', {
+//ml-4 mr-4
+const FoundrycardFooterVariants = cva('flex items-center min-h-14 pl-4 pr-4 ', {
   variants: {
     variant: {
       default: 'border-t border-border',

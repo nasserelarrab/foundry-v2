@@ -6,20 +6,21 @@ import type { ColumnConfig } from '@/components/foundry/foundry-table/column-con
 
 export const PAGES_LIST_CONFIG: ColumnConfig[] = [
   {
-    id: 'page',
+    id: 'title',
     header: 'Page',
     fields: [
-      { path: 'title', ui: 'text' },
+      { path: 'title', ui: 'strong-text' },
       { path: 'path', ui: 'slug' },
       { paths: ['lang', 'status', 'type'], ui: 'tag' },
     ],
+    width: '20%',
     flex: true,
   },
   {
     id: 'seo',
     header: 'SEO',
     fields: [
-      { path: 'seo.label', ui: 'badge', badgeColor: '#10B981' },
+      { path: 'seo.label', ui: 'status-badge' },
       { path: 'seo.example', ui: 'italic' },
     ],
     flex: true,
@@ -28,8 +29,9 @@ export const PAGES_LIST_CONFIG: ColumnConfig[] = [
     id: 'updated',
     header: 'Updated',
     fields: [
+      { path: 'updated.avatar', ui: 'avatar' },
       { path: 'updated.user', ui: 'text' },
-      { path: 'updated.time', ui: 'text' },
+      { path: 'updated.time', ui: 'time' },
     ],
     // width: '20%',
     flex: true,
@@ -37,14 +39,14 @@ export const PAGES_LIST_CONFIG: ColumnConfig[] = [
   {
     id: 'publication',
     header: 'Publication',
-    fields: [{ path: 'publication', ui: 'badge', badgeColor: '#3B82F6' }],
+    fields: [{ path: 'publication.status', ui: 'text', iconType: 'publication' },{path: 'publication.date', ui: 'date'}],
     // width: '10%',
     flex: true,
   },
   {
     id: 'blocks',
     header: 'Blocks',
-    fields: [{ path: 'blocks', ui: 'text' }],
+    fields: [{ path: 'blocks', ui: 'strong-number' }],
     // width: '10%',
     flex: true,
   },

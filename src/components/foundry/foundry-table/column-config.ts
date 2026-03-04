@@ -2,13 +2,33 @@
 
 import { Document, Home, People, StatusOnline } from '@/components/icons';
 
-export type FieldUI = 'text' | 'badge' | 'slug' | 'custom' | 'tag' | 'italic' | 'image';
+export type FieldUI = 
+  | 'text' 
+  | 'number' 
+  | 'currency' 
+  | 'date' 
+  | 'time' 
+  | 'avatar'
+  | 'badge' 
+  | 'status-badge' 
+  | 'tag' 
+  | 'italic' 
+  | 'strong-text' 
+  | 'strong-number' 
+  | 'custom' 
+  | 'slug' 
+  | 'image';
 // 'slug' renders muted/path-style text (no interactive link)
 // 'custom' is for array values which should be displayed specially (e.g. tags)
 // 'tag' renders compact gray inline tags (for page tags)
 // 'badge' renders compact colored inline badges fitting text only; customize with badgeColor
+// 'status-badge' renders colored badges based on value: good/green, bad/red, ok/yellow
 // 'italic' renders muted italic text
 // 'image' renders an image from the path (for avatars, thumbnails, etc.)
+// 'status-badge' is a new badge type
+// 'date' renders full date in format "Oct 10, 2023 02:15 PM" with muted text
+// 'strong-text' renders bold text for emphasis
+// 'strong-number' renders numbers inside gray span for emphasis
 
 
 export interface FieldConfig {
@@ -25,6 +45,8 @@ export interface FieldConfig {
   badgeColor?: string;
   /** icon to display before the field value */
   icon?: React.ReactNode;
+  /** icon type for dynamic icon rendering based on field value */
+  iconType?: 'status' | 'user' | 'custom' | 'publication';
 }
 
 export interface ColumnConfig {

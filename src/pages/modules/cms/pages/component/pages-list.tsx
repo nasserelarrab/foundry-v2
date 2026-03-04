@@ -16,6 +16,7 @@ import { EllipsisVertical } from 'lucide-react';
 import { Row } from '@tanstack/react-table';
 import { FoundryTable } from '@/components/foundry/foundry-table/foundry-table';
 import { PAGES_LIST_CONFIG } from '../config/pages-list-table.config';
+import { date } from 'zod';
 
 // The PagesList component is now configurable via props. You can supply
 // a `columnConfig` array (see `src/config/column-config.ts` for shape) and
@@ -37,24 +38,44 @@ import { PAGES_LIST_CONFIG } from '../config/pages-list-table.config';
 // page list data (mocked to match new design screenshot)
 interface IData {
   id: string;
+  parentId?: string;
   title: string;
   path: string;
-  parentId?: string; // for standalone child rows
-  lang?: string;
-  type?: string;
-  status?: string;
-  seo: {
-    label: string; // GOOD, BAD, OK, etc
-    score: number;
-    example?: string;
-  };
-  updated?: {
-    user?: string;
-    time?: string;
-  };
-  publication?: 'Published' | 'Scheduled' | 'Draft';
+  lang: string;
+  type: string;
+  status: string;
+  seo: { label: string; score: number; example: string };
+  updated: { user: string; time: string; avatar?: string };
+  publication: {status:string;date:Date};
   blocks?: number;
+  child?: IData[];
 }
+
+// Helper function to get random avatar
+const getRandomAvatar = (): string => {
+  const avatarNumbers = Array.from({ length: 34 }, (_, i) => i + 1); // 1-34
+  const randomIndex = Math.floor(Math.random() * avatarNumbers.length);
+  return `/media/avatars/300-${avatarNumbers[randomIndex]}.png`;
+};
+
+// Helper function to flatten nested data with children
+const flattenData = (items: IData[]): IData[] => {
+  const flattened: IData[] = [];
+  
+  items.forEach(item => {
+    // Add the parent item
+    flattened.push(item);
+    
+    // Add all children immediately after the parent if they exist
+    if (item.child && Array.isArray(item.child)) {
+      item.child.forEach(child => {
+        flattened.push(child);
+      });
+    }
+  });
+  flattened.reverse()
+  return flattened;
+};
 
 // later we may import a large JSON file; for now keep the inline data
 const data: IData[] = [
@@ -66,8 +87,8 @@ const data: IData[] = [
     type: 'Basic',
     status: 'Published',
     seo: { label: 'GOOD', score: 92, example: '"Modern Furniture"' },
-    updated: { user: 'Ahmed', time: '2 hours ago' },
-    publication: 'Published',
+    updated: { user: 'Ahmed', time: '2 hours ago', avatar: getRandomAvatar() },
+    publication: {status:'Published',date:new Date()},
     blocks: 12,
   },
   {
@@ -78,9 +99,22 @@ const data: IData[] = [
     type: 'Basic',
     status: 'Published',
     seo: { label: 'GOOD', score: 85, example: '"Our Story"' },
-    updated: { user: 'Sarah K.', time: '5 hours ago' },
-    publication: 'Published',
+    updated: { user: 'Sarah K.', time: '5 hours ago', avatar: getRandomAvatar() },
+    publication: {status:'Published',date:new Date()},
     blocks: 5,
+    child:[  {
+                id: '8',
+                parentId: '2',
+                title: 'Landing1',
+                path: '/summer-collection/landing',
+                lang: 'EN',
+                type: 'Landing',
+                status: 'Scheduled',
+                seo: { label: 'BAD', score: 45, example: '' },
+                updated: { user: 'Layla M.', time: '3 hours ago', avatar: getRandomAvatar() },
+                publication: {status:'Scheduled',date:new Date()},
+                blocks: 7,
+              },]
   },
   {
     id: '3',
@@ -90,21 +124,11 @@ const data: IData[] = [
     type: 'Landing',
     status: 'Scheduled',
     seo: { label: 'BAD', score: 45, example: '"Summer Trends"' },
-    updated: { user: 'Ahmed', time: '2 days ago' },
-    publication: 'Scheduled',
+    updated: { user: 'Ahmed', time: '2 days ago', avatar: getRandomAvatar() },
+    publication: {status:'Scheduled',date:new Date()},
     blocks: 3,
   },
-  {
-    id: '3-1',
-    parentId: '3',
-    title: 'Landing',
-    path: '/summer-collection/landing',
-    lang: 'EN',
-    type: 'Landing',
-    status: 'Scheduled',
-    seo: { label: 'BAD', score: 45, example: '' },
-    publication: 'Scheduled',
-  },
+
   {
     id: '4',
     title: 'About Us - عن نحن',
@@ -113,8 +137,8 @@ const data: IData[] = [
     type: 'Content',
     status: 'Draft',
     seo: { label: 'BAD', score: 12, example: '"عن نهم"' },
-    updated: { user: 'Layla M.', time: '3 hours ago' },
-    publication: 'Draft',
+    updated: { user: 'Layla M.', time: '3 hours ago', avatar: getRandomAvatar() },
+    publication: {status:'Draft',date:new Date()},
     blocks: 2,
   },
   {
@@ -125,9 +149,22 @@ const data: IData[] = [
     type: 'Staff',
     status: 'Published',
     seo: { label: 'OK', score: 78, example: '"Management Team"' },
-    updated: { user: 'Sarah K.', time: '1 week ago' },
-    publication: 'Published',
+    updated: { user: 'Sarah K.', time: '1 week ago', avatar: getRandomAvatar() },
+    publication: {status:'Published',date:new Date()},
     blocks: 8,
+     child:[  {
+        id: '12',
+        parentId: '5',
+        title: 'Landing',
+        path: '/summer-collection/landing',
+        lang: 'EN',
+        type: 'Landing',
+        status: 'Scheduled',
+        seo: { label: 'BAD', score: 45, example: '' },
+        updated: { user: 'Layla M.', time: '3 hours ago', avatar: getRandomAvatar() },
+        publication: {status:'Scheduled',date:new Date()},
+        blocks: 4,
+      },]
   },
   // additional rows can be added here for testing
 ];
@@ -184,14 +221,16 @@ interface PagesListProps {
 
 const PagesList = ({ columnConfig = PAGES_LIST_CONFIG, dataOverride }: PagesListProps) => {
   const sourceData = dataOverride || data;
+  // Flatten the data to include child rows
+  const flattenedData = flattenData(sourceData);
 
   return (
     <FoundryTable<IData>
       columnConfig={columnConfig}
-      data={sourceData}
+      data={flattenedData}
       ActionsCell={ActionsCell}
       showCheckbox={false}
-      defaultSorting={[{ id: 'title', desc: false }]}
+      showActionsCell={false}
     />
   );
 };
