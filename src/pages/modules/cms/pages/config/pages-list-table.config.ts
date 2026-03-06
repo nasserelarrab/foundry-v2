@@ -5,6 +5,15 @@ import type { ColumnConfig } from '@/components/foundry/foundry-table/column-con
 // config file alongside it, so the module remains self‑contained.
 
 export const PAGES_LIST_CONFIG: ColumnConfig[] = [
+   // Checkbox column
+    {
+    id: 'select',
+    type: 'checkbox',
+    header: '',                    // optional, can be empty
+    enableHiding: true,            // allow hiding (optional)
+    defaultVisible: false,
+    fields: [],
+  },
   {
     id: 'title',
     header: 'Page',
@@ -13,8 +22,9 @@ export const PAGES_LIST_CONFIG: ColumnConfig[] = [
       { path: 'path', ui: 'slug' },
       { paths: ['lang', 'status', 'type'], ui: 'tag' },
     ],
-    width: '20%',
+
     flex: true,
+    defaultVisible: true,
   },
   {
     id: 'seo',
@@ -24,6 +34,7 @@ export const PAGES_LIST_CONFIG: ColumnConfig[] = [
       { path: 'seo.example', ui: 'italic' },
     ],
     flex: true,
+    defaultVisible: true,
   },
   {
     id: 'updated',
@@ -35,6 +46,7 @@ export const PAGES_LIST_CONFIG: ColumnConfig[] = [
     ],
     // width: '20%',
     flex: true,
+    defaultVisible: true,
   },
   {
     id: 'publication',
@@ -42,12 +54,23 @@ export const PAGES_LIST_CONFIG: ColumnConfig[] = [
     fields: [{ path: 'publication.status', ui: 'text', iconType: 'publication' },{path: 'publication.date', ui: 'date'}],
     // width: '10%',
     flex: true,
+    defaultVisible: true,
   },
   {
     id: 'blocks',
     header: 'Blocks',
     fields: [{ path: 'blocks', ui: 'strong-number' }],
-    // width: '10%',
-    flex: true,
+     width: '20',
+    // flex: true,
+    defaultVisible: false,
+  },
+      // Actions column
+  {
+    id: 'actions',
+    type: 'actions',
+    header: 'Actions', // optional, defaults to 'Actions'
+    enableHiding: true,
+    defaultVisible: false,
+    fields: []
   },
 ];

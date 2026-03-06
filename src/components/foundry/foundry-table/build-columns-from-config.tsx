@@ -6,12 +6,17 @@
  *   import { buildColumnsFromConfig } from '@/components/foundry/foundry-table/build-columns-from-config';
  *   import { PAGES_LIST_CONFIG } from '@/pages/modules/cms/pages/config/pages-list-table.config';
  *   
- *   const columns = buildColumnsFromConfig(PAGES_LIST_CONFIG);
+ *   const columns = buildColumnsFromConfig(PAGES_LIST_CONFIG, { ActionsCell, rowIdField: 'id' });
  */
 
 import { ColumnDef } from '@tanstack/react-table';
 import { ColumnConfig, FieldConfig } from './column-config';
 import { DataGridColumnHeader } from '@/components/ui/data-grid-column-header';
+import { DataGridTableRowSelect, DataGridTableRowSelectAll } from '@/components/ui/data-grid-table';
+
+// ----------------------------------------------------------------------
+// Helper functions (all yours, kept exactly as they were)
+// ----------------------------------------------------------------------
 
 /**
  * Helper to format date in "Oct 10, 2023 02:15 PM" format
@@ -32,7 +37,7 @@ const formatDate = (timestamp: string | number | Date): string => {
   const minutes = date.getMinutes();
   const ampm = hours >= 12 ? 'PM' : 'AM';
   
-  hours = hours % 12 || 12; // Convert 0 to 12
+  hours = hours % 12 || 12;
   const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
   const formattedHours = hours < 10 ? `0${hours}` : hours;
   
@@ -74,9 +79,9 @@ const getRelativeTime = (timestamp: string | number | Date): string => {
  */
 const ClockIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none">
-    <g clip-path="url(#clip0_80_1652)">
-      <path d="M6 11C8.76142 11 11 8.76142 11 6C11 3.23858 8.76142 1 6 1C3.23858 1 1 3.23858 1 6C1 8.76142 3.23858 11 6 11Z" stroke="#676A72" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M6 3V6L8 7" stroke="#676A72" stroke-linecap="round" stroke-linejoin="round"/>
+    <g clipPath="url(#clip0_80_1652)">
+      <path d="M6 11C8.76142 11 11 8.76142 11 6C11 3.23858 8.76142 1 6 1C3.23858 1 1 3.23858 1 6C1 8.76142 3.23858 11 6 11Z" stroke="#676A72" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M6 3V6L8 7" stroke="#676A72" strokeLinecap="round" strokeLinejoin="round"/>
     </g>
     <defs>
       <clipPath id="clip0_80_1652">
@@ -86,10 +91,12 @@ const ClockIcon = () => (
   </svg>
 );
 
-// Child row arrow icon
+/**
+ * Child row arrow icon
+ */
 const ChildArrowIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-    <path d="M4 2V14L12 8L4 2Z" fill="#8E9198" fill-opacity="0.3"/>
+    <path d="M4 2V14L12 8L4 2Z" fill="#8E9198" fillOpacity="0.3"/>
   </svg>
 );
 
@@ -154,9 +161,9 @@ const getDynamicIcon = (iconType: string | undefined, value: any): React.ReactNo
       if (value === 'Published') {
         return (
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <g clip-path="url(#clip0_80_1673)">
-              <path d="M7.99992 14.6667C11.6818 14.6667 14.6666 11.6819 14.6666 8C14.6666 4.3181 11.6818 1.33333 7.99992 1.33333C4.31802 1.33333 1.33325 4.3181 1.33325 8C1.33325 11.6819 4.31802 14.6667 7.99992 14.6667Z" stroke="#0D8446" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M6 8.00001L7.33333 9.33334L10 6.66667" stroke="#0D8446" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+            <g clipPath="url(#clip0_80_1673)">
+              <path d="M7.99992 14.6667C11.6818 14.6667 14.6666 11.6819 14.6666 8C14.6666 4.3181 11.6818 1.33333 7.99992 1.33333C4.31802 1.33333 1.33325 4.3181 1.33325 8C1.33325 11.6819 4.31802 14.6667 7.99992 14.6667Z" stroke="#0D8446" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M6 8.00001L7.33333 9.33334L10 6.66667" stroke="#0D8446" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
             </g>
             <defs>
               <clipPath id="clip0_80_1673">
@@ -168,9 +175,9 @@ const getDynamicIcon = (iconType: string | undefined, value: any): React.ReactNo
       } else if (value === 'Scheduled') {
         return (
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <g clip-path="url(#clip0_80_1695)">
-              <path d="M7.99992 14.6667C11.6818 14.6667 14.6666 11.6819 14.6666 8.00001C14.6666 4.31811 11.6818 1.33334 7.99992 1.33334C4.31802 1.33334 1.33325 4.31811 1.33325 8.00001C1.33325 11.6819 4.31802 14.6667 7.99992 14.6667Z" stroke="#0084FF" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M8 4V8L10.6667 9.33333" stroke="#0084FF" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+            <g clipPath="url(#clip0_80_1695)">
+              <path d="M7.99992 14.6667C11.6818 14.6667 14.6666 11.6819 14.6666 8.00001C14.6666 4.31811 11.6818 1.33334 7.99992 1.33334C4.31802 1.33334 1.33325 4.31811 1.33325 8.00001C1.33325 11.6819 4.31802 14.6667 7.99992 14.6667Z" stroke="#0084FF" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M8 4V8L10.6667 9.33333" stroke="#0084FF" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
             </g>
             <defs>
               <clipPath id="clip0_80_1695">
@@ -182,19 +189,18 @@ const getDynamicIcon = (iconType: string | undefined, value: any): React.ReactNo
       } else if (value === 'Draft') {
         return (
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M7.99992 14.6667C11.6818 14.6667 14.6666 11.6819 14.6666 8.00001C14.6666 4.31811 11.6818 1.33334 7.99992 1.33334C4.31802 1.33334 1.33325 4.31811 1.33325 8.00001C1.33325 11.6819 4.31802 14.6667 7.99992 14.6667Z" stroke="#676A72" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M7.99992 14.6667C11.6818 14.6667 14.6666 11.6819 14.6666 8.00001C14.6666 4.31811 11.6818 1.33334 7.99992 1.33334C4.31802 1.33334 1.33325 4.31811 1.33325 8.00001C1.33325 11.6819 4.31802 14.6667 7.99992 14.6667Z" stroke="#676A72" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         );
       }
       return null;
     case 'publication':
-      // Handle publication status with custom icons
       if (value === 'Published') {
         return (
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <g clip-path="url(#clip0_80_1673)">
-              <path d="M7.99992 14.6667C11.6818 14.6667 14.6666 11.6819 14.6666 8C14.6666 4.3181 11.6818 1.33333 7.99992 1.33333C4.31802 1.33333 1.33325 4.3181 1.33325 8C1.33325 11.6819 4.31802 14.6667 7.99992 14.6667Z" stroke="#0D8446" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M6 8.00001L7.33333 9.33334L10 6.66667" stroke="#0D8446" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+            <g clipPath="url(#clip0_80_1673)">
+              <path d="M7.99992 14.6667C11.6818 14.6667 14.6666 11.6819 14.6666 8C14.6666 4.3181 11.6818 1.33333 7.99992 1.33333C4.31802 1.33333 1.33325 4.3181 1.33325 8C1.33325 11.6819 4.31802 14.6667 7.99992 14.6667Z" stroke="#0D8446" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M6 8.00001L7.33333 9.33334L10 6.66667" stroke="#0D8446" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
             </g>
             <defs>
               <clipPath id="clip0_80_1673">
@@ -206,9 +212,9 @@ const getDynamicIcon = (iconType: string | undefined, value: any): React.ReactNo
       } else if (value === 'Scheduled') {
         return (
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <g clip-path="url(#clip0_80_1695)">
-              <path d="M7.99992 14.6667C11.6818 14.6667 14.6666 11.6819 14.6666 8.00001C14.6666 4.31811 11.6818 1.33334 7.99992 1.33334C4.31802 1.33334 1.33325 4.31811 1.33325 8.00001C1.33325 11.6819 4.31802 14.6667 7.99992 14.6667Z" stroke="#0084FF" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M8 4V8L10.6667 9.33333" stroke="#0084FF" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+            <g clipPath="url(#clip0_80_1695)">
+              <path d="M7.99992 14.6667C11.6818 14.6667 14.6666 11.6819 14.6666 8.00001C14.6666 4.31811 11.6818 1.33334 7.99992 1.33334C4.31802 1.33334 1.33325 4.31811 1.33325 8.00001C1.33325 11.6819 4.31802 14.6667 7.99992 14.6667Z" stroke="#0084FF" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M8 4V8L10.6667 9.33333" stroke="#0084FF" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
             </g>
             <defs>
               <clipPath id="clip0_80_1695">
@@ -220,7 +226,7 @@ const getDynamicIcon = (iconType: string | undefined, value: any): React.ReactNo
       } else if (value === 'Draft') {
         return (
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M7.99992 14.6667C11.6818 14.6667 14.6666 11.6819 14.6666 8.00001C14.6666 4.31811 11.6818 1.33334 7.99992 1.33334C4.31802 1.33334 1.33325 4.31811 1.33325 8.00001C1.33325 11.6819 4.31802 14.6667 7.99992 14.6667Z" stroke="#676A72" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M7.99992 14.6667C11.6818 14.6667 14.6666 11.6819 14.6666 8.00001C14.6666 4.31811 11.6818 1.33334 7.99992 1.33334C4.31802 1.33334 1.33325 4.31811 1.33325 8.00001C1.33325 11.6819 4.31802 14.6667 7.99992 14.6667Z" stroke="#676A72" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         );
       }
@@ -234,20 +240,15 @@ const getDynamicIcon = (iconType: string | undefined, value: any): React.ReactNo
  * Helper to darken a hex color by a certain percentage
  */
 const darkenColor = (color: string, percent: number = 50): string => {
-  // Remove # if present
   const hex = color.replace('#', '');
-  
-  // Parse r, g, b values
   const r = parseInt(hex.substr(0, 2), 16);
   const g = parseInt(hex.substr(2, 2), 16);
   const b = parseInt(hex.substr(4, 2), 16);
   
-  // Darken each color
   const darkenedR = Math.round(r * (1 - percent / 100));
   const darkenedG = Math.round(g * (1 - percent / 100));
   const darkenedB = Math.round(b * (1 - percent / 100));
   
-  // Convert back to hex
   const toHex = (n: number) => {
     const hex = n.toString(16);
     return hex.length === 1 ? '0' + hex : hex;
@@ -266,18 +267,90 @@ export const getValue = (row: any, path?: string): any => {
   return path.split('.').reduce((o, key) => (o ? o[key] : undefined), row);
 };
 
-/**
- * Build column definitions from configuration.
- * Handles multiple UI types: text, badge, tag, slug, custom
- * Supports single and multi-value fields via `path` and `paths`.
- * 
- * @param configs - Array of ColumnConfig defining structure and rendering
- * @returns ColumnDef array ready for @tanstack/react-table
- */
-export const buildColumnsFromConfig = (configs: ColumnConfig[]): ColumnDef<any>[] => {
+// ----------------------------------------------------------------------
+// Main builder function
+// ----------------------------------------------------------------------
+
+export const buildColumnsFromConfig = (
+  configs: ColumnConfig[],
+  options?: { ActionsCell?: any; rowIdField?: string }
+): ColumnDef<any>[] => {
   return configs.map((cfg) => {
-    return {
+    // Common properties for all columns
+    const common = {
       id: cfg.id,
+      enableHiding: cfg.enableHiding !== false, // default true
+    };
+
+    // --- Checkbox column ---
+    if (cfg.type === 'checkbox') {
+      return {
+        ...common,
+        accessorKey: options?.rowIdField || 'id',
+        header: () => <DataGridTableRowSelectAll disabled={false} />,
+        cell: ({ row }: any) => <DataGridTableRowSelect row={row} disabled={false} />,
+        enableSorting: false,
+        enableResizing: false,
+        size: 50,
+        meta: { cellClassName: '' },
+      } as ColumnDef<any>;
+    }
+
+    // --- Actions column ---
+    if (cfg.type === 'actions') {
+      if (!options?.ActionsCell) {
+        console.warn(
+          `[buildColumnsFromConfig] Actions column "${cfg.id}" defined but no ActionsCell provided. ` +
+          `Make sure you pass ActionsCell prop to FoundryTable.`
+        );
+        // Return a placeholder column so the column still appears (with empty cells)
+        return {
+          ...common,
+          header: cfg.header || 'Actions',
+          cell: () => <span style={{ color: '#999' }}>—</span>,
+          enableSorting: false,
+          enableResizing: false,
+          size: 80,
+          meta: { cellClassName: '' },
+        } as ColumnDef<any>;
+      }
+
+      return {
+        ...common,
+        header: cfg.header || 'Actions',
+        cell: ({ row }: any) => {
+          console.log('[ActionsCell] rendering for row:', row.original);
+          const rendered = <options.ActionsCell row={row} />;
+          if (!rendered) {
+            console.warn('[ActionsCell] returned null/undefined for row:', row.original);
+          }
+          return rendered;
+        },
+        enableSorting: false,
+        enableResizing: false,
+        size: 80,
+        meta: { cellClassName: '' },
+      } as ColumnDef<any>;
+    }
+
+    // --- Data column (default) ---
+// Determine sizing props based on flex/width
+    const sizingProps: Partial<ColumnDef<any>> = {};
+    if (cfg.flex) {
+      // Flex columns: size exactly to content, but set a minimal minSize (30px) to avoid collapse
+      sizingProps.minSize = 30;
+    } else if (cfg.width) {
+      // Fixed width: parse as number (pixels)
+      const size = typeof cfg.width === 'number' ? cfg.width : parseInt(cfg.width, 10);
+      if (!isNaN(size)) {
+        sizingProps.size = size;
+        sizingProps.minSize = size; // prevent shrinking below fixed width
+      }
+    }
+
+    return {
+      ...common,
+      ...sizingProps,
       header: ({ column }: any) => (
         <DataGridColumnHeader title={cfg.header} column={column} />
       ),
@@ -300,10 +373,7 @@ export const buildColumnsFromConfig = (configs: ColumnConfig[]): ColumnDef<any>[
             style={{
               display: 'flex',
               flexDirection: 'column',
-              ...(cfg.flex
-                ? { minWidth: 'calc(max-content + 20%)' }
-                : {}),
-              // Add padding for child rows
+              // Removed the old minWidth style
               ...(isChildRow && cfg.id === 'title' 
                 ? { paddingLeft: '24px' } 
                 : {}),
@@ -614,7 +684,6 @@ export const buildColumnsFromConfig = (configs: ColumnConfig[]): ColumnDef<any>[
                     alignItems: 'center', 
                     gap: '4px',
                     color: '#2C2D30',
-
                     fontSize: '0.875rem',
                     fontStyle: 'normal',
                     fontWeight: '700',
@@ -631,23 +700,23 @@ export const buildColumnsFromConfig = (configs: ColumnConfig[]): ColumnDef<any>[
               if (f.ui === 'strong-number' && typeof v === 'number') {
                 return (
                   <div key={idx} style={{ display: 'inline-flex', gap: '4px', flexWrap: 'wrap', position: 'relative', paddingBottom: '5px', alignItems: 'center' }}>
-                  <span key={idx} className="text-sm text-muted-foreground font-semibold  " style={{ 
-                    paddingBottom: '5px', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '4px',
-                    color: '#2C2D30',
-                    backgroundColor: '#E5E7EB',
-                    padding: '2px 6px',
-                    borderRadius: '4px',
-                    fontSize: '0.875rem',
-                    fontStyle: 'normal',
-                    fontWeight: '700',
-                    lineHeight: '1.3125rem'
-                  }}>
-                    {f.icon && <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>{f.icon}</span>}
-                    {v}
-                  </span>
+                    <span style={{ 
+                      paddingBottom: '5px', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '4px',
+                      color: '#2C2D30',
+                      backgroundColor: '#E5E7EB',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      fontSize: '0.875rem',
+                      fontStyle: 'normal',
+                      fontWeight: '700',
+                      lineHeight: '1.3125rem'
+                    }}>
+                      {f.icon && <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>{f.icon}</span>}
+                      {v}
+                    </span>
                   </div>
                 );
               }
@@ -672,7 +741,7 @@ export const buildColumnsFromConfig = (configs: ColumnConfig[]): ColumnDef<any>[
                   </div>
                 );
               }
-              // default text with optional icon
+              // default text with optional icon – ensure we never render a Date object directly
               const dynamicIcon = getDynamicIcon(f.iconType, v);
               if (dynamicIcon) {
                 // If there's a dynamic icon, create two-column layout like avatar
@@ -687,16 +756,18 @@ export const buildColumnsFromConfig = (configs: ColumnConfig[]): ColumnDef<any>[
                     {/* Text column with grouped fields */}
                     <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
                       {/* Publication status */}
-                      <span className="text-sm" style={{ paddingBottom: '5px' }}>{v}</span>
+                      <span className="text-sm" style={{ paddingBottom: '5px' }}>
+                        {v instanceof Date ? formatDate(v) : v}
+                      </span>
                     </div>
                   </div>
                 );
               }
-              // Regular text with optional static icon
+              // Regular text with optional static icon – also ensure no Date
               return (
                 <span key={idx} className="text-sm" style={{ paddingBottom: '5px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   {f.icon && <span style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>{f.icon}</span>}
-                  {v}
+                  {v instanceof Date ? formatDate(v) : v}
                 </span>
               );
             })}
@@ -705,10 +776,9 @@ export const buildColumnsFromConfig = (configs: ColumnConfig[]): ColumnDef<any>[
       },
       enableSorting: true,
       enableResizing: true,
-      ...(cfg.width ? { size: cfg.width } : {}),
       meta: {
         cellClassName: '',
       },
     } as ColumnDef<any>;
-  });
+  }).filter(Boolean); // remove any null entries (if actions column was skipped)
 };

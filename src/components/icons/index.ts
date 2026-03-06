@@ -36,8 +36,14 @@ import TabletTextDown from './tablet-text-down.svg?react';
 import Technology4 from './technology-4.svg?react';
 import TextCircle from './text-circle.svg?react';
 import Up from './up.svg?react';
+import Sort from './sort.svg?react';
+import Filter from './filter.svg?react';
+import Columns from './columns.svg?react';
 
 export {
+  Sort,
+  Filter,
+  Columns,
   Abstract26,
   AddressBook,
   BurgerMenu,

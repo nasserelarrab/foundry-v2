@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { ColumnConfig } from './column-config';
-import { buildColumnsFromConfig } from './build-columns-from-config.tsx';
+import { buildColumnsFromConfig } from './build-columns-from-config';
 import {
   ColumnDef,
   getCoreRowModel,
@@ -12,11 +12,12 @@ import {
   PaginationState,
   SortingState,
   useReactTable,
+  VisibilityState,
+  ColumnFiltersState,
 } from '@tanstack/react-table';
 import { DataGrid } from '@/components/ui/data-grid';
 import { DataGridPagination } from '@/components/ui/data-grid-pagination';
 import { DataGridTable } from '@/components/ui/data-grid-table';
-import { DataGridTableRowSelect, DataGridTableRowSelectAll } from '@/components/ui/data-grid-table';
 import {
   Card,
   FoundryCardFooter,
@@ -24,28 +25,16 @@ import {
   FoundryCardTable,
 } from '@/components/ui/card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import FoundryTableHeader from '@/components/foundry/FoundryTableHeader';
+import FoundryTableHeader from '@/components/foundry/foundry-table/FoundryTableHeader';
 
 export interface FoundryTableProps<T = any> {
-  /** Configuration driving columns/fields */
   columnConfig: ColumnConfig[];
-  /** Data to display in the table */
   data: T[];
-  /** Optional unique ID field for rows (defaults to 'id') */
   rowIdField?: string;
-  /** Show checkbox column for row selection */
-  showCheckbox?: boolean;
-  /** Show actions cell column */
-  showActionsCell?: boolean;
-  /** Default pagination state */
   defaultPagination?: PaginationState;
-  /** Default sorting state */
   defaultSorting?: SortingState;
-  /** Custom actions cell component */
   ActionsCell?: ({ row }: { row: any }) => React.ReactNode;
-  /** Custom header component */
   customHeader?: React.ReactNode;
-  /** Table layout options */
   tableLayout?: {
     columnsPinnable?: boolean;
     columnsMovable?: boolean;
@@ -61,8 +50,6 @@ const FoundryTable = <T extends Record<string, any>>({
   columnConfig,
   data,
   rowIdField = 'id',
-  showCheckbox = false,
-  showActionsCell = true,
   defaultPagination = { pageIndex: 0, pageSize: 10 },
   defaultSorting = [{ id: 'title', desc: false }],
   ActionsCell,
@@ -79,86 +66,68 @@ const FoundryTable = <T extends Record<string, any>>({
 }: FoundryTableProps<T>) => {
   const [pagination, setPagination] = useState<PaginationState>(defaultPagination);
   const [sorting, setSorting] = useState<SortingState>(defaultSorting);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
-
-  // Filter data based on search and filters
-  const filteredData = useMemo(() => {
-    return data.filter((item) => {
-      // Filter by selected filters
-      const matchesFilters =
-        !selectedFilters?.length ||
-        selectedFilters.some((filter) => {
-          // This is a generic filter - you might want to customize this based on your data structure
-          return Object.values(item).some((value) => 
-            value && String(value).toLowerCase().includes(filter.toLowerCase())
-          );
-        });
-
-      // Filter by search query (case-insensitive)
-      const searchLower = searchQuery.toLowerCase();
-      const matchesSearch =
-        !searchQuery ||
-        Object.values(item).some((value) => 
-          value && String(value).toLowerCase().includes(searchLower)
-        );
-
-      return matchesFilters && matchesSearch;
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(() => {
+    const initial: VisibilityState = {};
+    columnConfig.forEach((col) => {
+      initial[col.id] = col.defaultVisible !== false;
     });
-  }, [searchQuery, selectedFilters, data]);
+    return initial;
+  });
+
+  // New states for filtering
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [globalFilter, setGlobalFilter] = useState('');
 
   // Build columns from config
   const columns = useMemo<ColumnDef<T>[]>(() => {
-    const base: ColumnDef<T>[] = [];
+    return buildColumnsFromConfig(columnConfig, { ActionsCell, rowIdField }) as ColumnDef<T>[];
+  }, [columnConfig, ActionsCell, rowIdField]);
 
-    // Add checkbox column if enabled
-    if (showCheckbox) {
-      base.push({
-        accessorKey: rowIdField,
-        accessorFn: (row) => row[rowIdField],
-        header: () => <DataGridTableRowSelectAll disabled={false} />,
-        cell: ({ row }) => <DataGridTableRowSelect row={row} disabled={false} />,
-        enableSorting: false,
-        enableHiding: false,
-        enableResizing: false,
-        meta: {
-          cellClassName: '',
-        },
-      } as ColumnDef<T>);
-    }
+  // Compute visibleColumns object for header
+  const visibleColumnsObj = useMemo(() => {
+    const obj: Record<string, boolean> = {};
+    columnConfig.forEach((col) => {
+      obj[col.id] = columnVisibility[col.id] !== false;
+    });
+    return obj;
+  }, [columnVisibility, columnConfig]);
 
-    // Add dynamic columns from config
-    const configColumns = buildColumnsFromConfig(columnConfig) as ColumnDef<T>[];
-    
-    // Add actions column if ActionsCell is provided and showActionsCell is true
-    if (ActionsCell && showActionsCell) {
-      configColumns.push({
-        id: 'actions',
-        header: 'Actions',
-        cell: ({ row }) => <ActionsCell row={row} />,
-        enableSorting: false,
-        enableResizing: false,
-        size: 80,
-        meta: {
-          cellClassName: '',
-        },
-      } as ColumnDef<T>);
-    }
+  const handleColumnToggle = (colId: string, visible: boolean) => {
+    setColumnVisibility((prev) => ({ ...prev, [colId]: visible }));
+  };
 
-    return base.concat(configColumns);
-  }, [columnConfig, showCheckbox, rowIdField, ActionsCell, showActionsCell]);
+  // Compute sortable and filterable columns (only data columns)
+  const sortableColumns = useMemo(() => {
+    return columnConfig
+      .filter(col => col.type === 'data')
+      .map(col => ({ id: col.id, header: col.header || col.id }));
+  }, [columnConfig]);
+
+  const filterableColumns = useMemo(() => {
+    return columnConfig
+      .filter(col => col.type === 'data')
+      .map(col => ({ id: col.id, header: col.header || col.id, dataType: 'string' }));
+  }, [columnConfig]);
 
   const table = useReactTable({
     columns,
-    data: filteredData,
-    pageCount: Math.ceil((filteredData?.length || 0) / pagination.pageSize),
+    data, // original data, table handles filtering
+    enableColumnResizing: true,
+    columnResizeMode: 'onChange',
+    pageCount: Math.ceil(data.length / pagination.pageSize),
     getRowId: (row: T) => row[rowIdField] || String(Math.random()),
     state: {
       pagination,
       sorting,
+      columnVisibility,
+      columnFilters,
+      globalFilter,
     },
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
+    onColumnVisibilityChange: setColumnVisibility,
+    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -168,61 +137,57 @@ const FoundryTable = <T extends Record<string, any>>({
   return (
     <DataGrid
       table={table}
-      recordCount={filteredData?.length || 0}
+      recordCount={table.getFilteredRowModel().rows.length}
       tableLayout={tableLayout}
     >
       <Card className="border-none">
         <CardHeaderFoundry>
           {customHeader || (
             <FoundryTableHeader
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              filtersCount={selectedFilters.length}
-              onTabChange={(tab) => {
-                console.log('tab changed to', tab);
-              }}
+              searchQuery={globalFilter}
+              onSearchChange={setGlobalFilter}
+              filtersCount={columnFilters.length}
+              sorting={sorting}
+              onSortingChange={setSorting}
+              sortableColumns={sortableColumns}
+              columnFilters={columnFilters}
+              onColumnFiltersChange={setColumnFilters}
+              filterableColumns={filterableColumns}
+              visibleColumns={visibleColumnsObj}
+              onColumnToggle={handleColumnToggle}
+              onTabChange={(tab) => console.log('tab changed to', tab)}
             />
           )}
         </CardHeaderFoundry>
         <FoundryCardTable>
-          <div
-            style={{
-              overflow: 'hidden',
-              borderRadius: 'inherit',
-            }}
-          >
+          <div style={{ overflow: 'hidden', borderRadius: 'inherit' }}>
             <ScrollArea>
-              <style>
-                {`
-                  /* remove panel-level border entirely */
-                  [data-slot="data-grid-table"] { border: none !important; }
-                  /* Hide outer borders, keep inner borders */
-                  [data-slot="data-grid-table"] tbody tr:first-child > td:first-child,
-                  [data-slot="data-grid-table"] tbody tr:first-child > td:last-child {
-                    border-top: none;
-                  }
-                  [data-slot="data-grid-table"] tbody tr:last-child > td:first-child,
-                  [data-slot="data-grid-table"] tbody tr:last-child > td:last-child {
-                    border-bottom: none;
-                  }
-                  [data-slot="data-grid-table"] tbody > tr > td:first-child {
-                    border-left: none;
-                  }
-                  [data-slot="data-grid-table"] tbody > tr > td:last-child {
-                    border-right: none;
-                  }
-                  [data-slot="data-grid-table"] thead tr > th:first-child {
-                    border-left: none;
-                  }
-                  [data-slot="data-grid-table"] thead tr > th:last-child {
-                    border-right: none;
-                  }
-                  /* restore header row bottom border by targeting cells (handles collapse) */
-                  [data-slot="data-grid-table"] thead tr > th {
-                    border-bottom: 1px solid #e5e7eb !important; /* tailwind border-gray-200 */
-                  }
-                `}
-              </style>
+              <style>{`
+                [data-slot="data-grid-table"] { border: none !important; }
+                [data-slot="data-grid-table"] tbody tr:first-child > td:first-child,
+                [data-slot="data-grid-table"] tbody tr:first-child > td:last-child {
+                  border-top: none;
+                }
+                [data-slot="data-grid-table"] tbody tr:last-child > td:first-child,
+                [data-slot="data-grid-table"] tbody tr:last-child > td:last-child {
+                  border-bottom: none;
+                }
+                [data-slot="data-grid-table"] tbody > tr > td:first-child {
+                  border-left: none;
+                }
+                [data-slot="data-grid-table"] tbody > tr > td:last-child {
+                  border-right: none;
+                }
+                [data-slot="data-grid-table"] thead tr > th:first-child {
+                  border-left: none;
+                }
+                [data-slot="data-grid-table"] thead tr > th:last-child {
+                  border-right: none;
+                }
+                [data-slot="data-grid-table"] thead tr > th {
+                  border-bottom: 1px solid #e5e7eb !important;
+                }
+              `}</style>
               <DataGridTable />
               <ScrollBar orientation="horizontal" />
             </ScrollArea>

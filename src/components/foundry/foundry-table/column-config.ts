@@ -53,52 +53,55 @@ export interface ColumnConfig {
   /** unique column id */
   id: string;
   header: string;
+  type?: 'data' | 'checkbox' | 'actions'; // default 'data'
   fields: FieldConfig[];
   /** width spec: either percent string, or flex flag to auto-size + padding */
   width?: string;
   flex?: boolean;
+  enableHiding?: boolean; 
+  defaultVisible?: boolean;
 }
 
 // example configuration mirroring pages-list usage
-export const PAGES_COLUMN_CONFIG: ColumnConfig[] = [
-  {
-    id: 'page',
-    header: 'Page',
-    fields: [
-      { path: 'title', ui: 'text', icon: <Document style={{ width: 16, height: 16, marginRight: 4 }} /> },
-      { path: 'path', ui: 'slug', icon: <Home style={{ width: 16, height: 16, marginRight: 4 }} /> },
-      { paths: ['lang', 'status', 'type'], ui: 'tag' },
-    ],
-    flex: true,
-  },
-  {
-    id: 'seo',
-    header: 'SEO',
-    fields: [
-      { path: 'seo.label', ui: 'badge', badgeVariant: 'success' },
-      { path: 'seo.example', ui: 'italic' },
-    ],
-    flex: true,
-  },
-  {
-    id: 'updated',
-    header: 'Updated',
-    fields: [
-      { path: 'updated.user', ui: 'text', icon: <People style={{ width: 16, height: 16, marginRight: 4 }} /> },
-      { path: 'updated.time', ui: 'text' },
-    ],
-    width: '20%',
-  },
-  {
-    id: 'publication',
-    header: 'Publication',
-    fields: [{ path: 'publication', ui: 'badge' }],
-    width: '10%',
-  },
-  {
-    id: 'blocks',
-    header: 'Blocks',
-    fields: [{ path: 'blocks', ui: 'text' }],
-    width: '10%',
-  },
-];
+// export const PAGES_COLUMN_CONFIG: ColumnConfig[] = [
+//   {
+//     id: 'page',
+//     header: 'Page',
+//     fields: [
+//       { path: 'title', ui: 'text', icon: <Document style={{ width: 16, height: 16, marginRight: 4 }} /> },
+//       { path: 'path', ui: 'slug', icon: <Home style={{ width: 16, height: 16, marginRight: 4 }} /> },
+//       { paths: ['lang', 'status', 'type'], ui: 'tag' },
+//     ],
+//     flex: true,
+//   },
+//   {
+//     id: 'seo',
+//     header: 'SEO',
+//     fields: [
+//       { path: 'seo.label', ui: 'badge', badgeVariant: 'success' },
+//       { path: 'seo.example', ui: 'italic' },
+//     ],
+//     flex: true,
+//   },
+//   {
+//     id: 'updated',
+//     header: 'Updated',
+//     fields: [
+//       { path: 'updated.user', ui: 'text', icon: <People style={{ width: 16, height: 16, marginRight: 4 }} /> },
+//       { path: 'updated.time', ui: 'text' },
+//     ],
+//     width: '20%',
+//   },
+//   {
+//     id: 'publication',
+//     header: 'Publication',
+//     fields: [{ path: 'publication', ui: 'badge' }],
+//     width: '10%',
+//   },
+//   {
+//     id: 'blocks',
+//     header: 'Blocks',
+//     fields: [{ path: 'blocks', ui: 'text' }],
+//     width: '10%',
+//   },
+// ];

@@ -50,7 +50,7 @@ const cardHeaderVariants = cva('flex items-center justify-between flex-wrap px-5
 const cardHeaderFoundryVariants = cva('flex items-center justify-between flex-wrap  min-h-14 gap-2.5', {
   variants: {
     variant: {
-      default: ' border-border',
+      default: 'border-b border-t border-border',
       accent: '',
     },
   },
