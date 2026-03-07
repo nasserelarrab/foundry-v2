@@ -156,7 +156,10 @@ const FoundryTable = <T extends Record<string, any>>({
 
   // Custom filter and sort state
   const [customFilters, setCustomFilters] = useState<FilterCondition[]>([]);
-  const [customSort, setCustomSort] = useState<SortConfig | null>(null);
+  const [customSort, setCustomSort] = useState<SortConfig | null>({
+      path: 'id', // replace with a field that always exists
+      desc: false,
+  });
 
   // Global search
   const [globalFilter, setGlobalFilter] = useState('');

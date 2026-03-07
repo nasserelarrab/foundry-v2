@@ -8,12 +8,12 @@ import {
 } from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Search, ArrowUpDown, Filter, Columns2 } from 'lucide-react';
+import { Search, ArrowUpDown, Columns2 } from 'lucide-react';
 import { SortPopover } from './SortPopover';
 import { FilterPopover } from './FilterPopover';
 import { FieldInfo } from './getNestedFields'; // adjust import path as needed
 import { FilterCondition, SortConfig } from '../FoundryTable'; // adjust import
-
+import { Sort,Filter,Columns } from '@/components/icons';
 interface FoundryTableHeaderProps {
   searchQuery?: string;
   onSearchChange?: (value: string) => void;
@@ -109,7 +109,7 @@ export default function FoundryTableHeader({
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" style={{ height: '28px', gap: '4px' }}>
-              <ArrowUpDown size={14} />
+              <Sort size={14} />
               <span>Sort</span>
             </Button>
           </PopoverTrigger>
@@ -163,7 +163,7 @@ export default function FoundryTableHeader({
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" style={{ height: '28px', padding: '7px 10px', background: 'black' }}>
-              <Columns2 size={14} className="text-white" />
+              <Columns size={14} className="text-white" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-56 p-3" align="end">

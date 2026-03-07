@@ -73,7 +73,7 @@ const flattenData = (items: IData[]): IData[] => {
       });
     }
   });
-  flattened.reverse()
+  // flattened.reverse()
   return flattened;
 };
 
