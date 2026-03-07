@@ -1,4 +1,3 @@
-// filter-fns.ts
 import { FilterFn } from '@tanstack/react-table';
 
 export interface FilterValue {

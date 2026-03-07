@@ -13,6 +13,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { ColumnConfig, FieldConfig } from './column-config';
 import { DataGridColumnHeader } from '@/components/ui/data-grid-column-header';
 import { DataGridTableRowSelect, DataGridTableRowSelectAll } from '@/components/ui/data-grid-table';
+import { customFilterFn } from './filter-fns';
 
 // ----------------------------------------------------------------------
 // Helper functions (all yours, kept exactly as they were)
@@ -334,7 +335,7 @@ export const buildColumnsFromConfig = (
     }
 
     // --- Data column (default) ---
-// Determine sizing props based on flex/width
+    // Determine sizing props based on flex/width
     const sizingProps: Partial<ColumnDef<any>> = {};
     if (cfg.flex) {
       // Flex columns: size exactly to content, but set a minimal minSize (30px) to avoid collapse
@@ -348,13 +349,25 @@ export const buildColumnsFromConfig = (
       }
     }
 
+    // Use the first field as the primary sort value
+    const primaryField = cfg.fields[0];
+    const accessorFn = (row: any) => {
+      const value = getValue(row, primaryField.path);
+      // If it's an array, sort by its length
+      if (Array.isArray(value)) {
+        return value.length;
+      }
+      // Otherwise return the value (string, number, date, etc.)
+      return value;
+    };
+
     return {
       ...common,
       ...sizingProps,
       header: ({ column }: any) => (
         <DataGridColumnHeader title={cfg.header} column={column} />
       ),
-      accessorFn: (row: any) => row,
+      accessorFn,          // use the extracted value for sorting/filtering
       cell: ({ row }: any) => {
         // Check if this is a child row (has parentId)
         const isChildRow = row.original.parentId;
@@ -776,6 +789,7 @@ export const buildColumnsFromConfig = (
       },
       enableSorting: true,
       enableResizing: true,
+      filterFn: customFilterFn,   // attach custom filter function for data columns
       meta: {
         cellClassName: '',
       },

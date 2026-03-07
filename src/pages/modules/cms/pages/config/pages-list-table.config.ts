@@ -22,7 +22,7 @@ export const PAGES_LIST_CONFIG: ColumnConfig[] = [
       { path: 'path', ui: 'slug' },
       { paths: ['lang', 'status', 'type'], ui: 'tag' },
     ],
-
+    type: 'data',
     flex: true,
     defaultVisible: true,
   },
@@ -34,6 +34,7 @@ export const PAGES_LIST_CONFIG: ColumnConfig[] = [
       { path: 'seo.example', ui: 'italic' },
     ],
     flex: true,
+    type: 'data',
     defaultVisible: true,
   },
   {
@@ -46,6 +47,7 @@ export const PAGES_LIST_CONFIG: ColumnConfig[] = [
     ],
     // width: '20%',
     flex: true,
+    type: 'data',
     defaultVisible: true,
   },
   {
@@ -53,6 +55,7 @@ export const PAGES_LIST_CONFIG: ColumnConfig[] = [
     header: 'Publication',
     fields: [{ path: 'publication.status', ui: 'text', iconType: 'publication' },{path: 'publication.date', ui: 'date'}],
     // width: '10%',
+    type: 'data',
     flex: true,
     defaultVisible: true,
   },
@@ -61,6 +64,7 @@ export const PAGES_LIST_CONFIG: ColumnConfig[] = [
     header: 'Blocks',
     fields: [{ path: 'blocks', ui: 'strong-number' }],
      width: '20',
+     type: 'data',
     // flex: true,
     defaultVisible: false,
   },

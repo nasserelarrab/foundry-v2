@@ -6,14 +6,10 @@ import { buildColumnsFromConfig } from './build-columns-from-config';
 import {
   ColumnDef,
   getCoreRowModel,
-  getFilteredRowModel,
   getPaginationRowModel,
-  getSortedRowModel,
   PaginationState,
-  SortingState,
   useReactTable,
   VisibilityState,
-  ColumnFiltersState,
 } from '@tanstack/react-table';
 import { DataGrid } from '@/components/ui/data-grid';
 import { DataGridPagination } from '@/components/ui/data-grid-pagination';
@@ -26,13 +22,26 @@ import {
 } from '@/components/ui/card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import FoundryTableHeader from '@/components/foundry/foundry-table/FoundryTableHeader';
+import { getNestedFields, FieldInfo } from './getNestedFields';
+import { getValue } from './build-columns-from-config'; // or from a separate utils file
+
+// Define filter condition and sort config types
+export interface FilterCondition {
+  path: string;
+  operator: 'contains' | 'equals' | 'greaterThan' | 'lessThan';
+  value: string;
+}
+
+export interface SortConfig {
+  path: string;
+  desc: boolean;
+}
 
 export interface FoundryTableProps<T = any> {
   columnConfig: ColumnConfig[];
   data: T[];
   rowIdField?: string;
   defaultPagination?: PaginationState;
-  defaultSorting?: SortingState;
   ActionsCell?: ({ row }: { row: any }) => React.ReactNode;
   customHeader?: React.ReactNode;
   tableLayout?: {
@@ -46,12 +55,84 @@ export interface FoundryTableProps<T = any> {
   };
 }
 
+// ----------------------------------------------------------------------
+// Filtering function
+// ----------------------------------------------------------------------
+function filterData<T>(data: T[], filters: FilterCondition[]): T[] {
+  if (filters.length === 0) return data;
+  return data.filter(item => {
+    return filters.every(cond => {
+      const val = getValue(item, cond.path);
+      const filterVal = cond.value;
+
+      // Handle null/boolean operators first (they may not need filterVal)
+      switch (cond.operator) {
+        case 'isNull':
+          return val === null || val === undefined;
+        case 'isNotNull':
+          return val !== null && val !== undefined;
+        case 'isTrue':
+          return val === true;
+        case 'isFalse':
+          return val === false;
+      }
+
+      // For other operators, if val is null/undefined, it can't match (unless operator is isNull/isNotNull)
+      if (val == null) return false;
+
+      // Now handle operators that require a value
+      switch (cond.operator) {
+        case 'contains':
+          return String(val).toLowerCase().includes(filterVal.toLowerCase());
+        case 'doesNotContain':
+          return !String(val).toLowerCase().includes(filterVal.toLowerCase());
+        case 'equals':
+          return String(val).toLowerCase() === filterVal.toLowerCase();
+        case 'notEquals':
+          return String(val).toLowerCase() !== filterVal.toLowerCase();
+        case 'greaterThan':
+          return Number(val) > Number(filterVal);
+        case 'lessThan':
+          return Number(val) < Number(filterVal);
+        default:
+          return true;
+      }
+    });
+  });
+}
+
+// ----------------------------------------------------------------------
+// Sorting function
+// ----------------------------------------------------------------------
+function sortData<T>(data: T[], sort: SortConfig | null): T[] {
+  if (!sort) return data;
+  const { path, desc } = sort;
+  return [...data].sort((a, b) => {
+    const aVal = getValue(a, path);
+    const bVal = getValue(b, path);
+    
+    // Handle numbers
+    if (typeof aVal === 'number' && typeof bVal === 'number') {
+      return desc ? bVal - aVal : aVal - bVal;
+    }
+    // Handle dates
+    if (aVal instanceof Date && bVal instanceof Date) {
+      return desc ? bVal.getTime() - aVal.getTime() : aVal.getTime() - bVal.getTime();
+    }
+    // Handle strings (or fallback)
+    const aStr = String(aVal ?? '').toLowerCase();
+    const bStr = String(bVal ?? '').toLowerCase();
+    if (aStr < bStr) return desc ? 1 : -1;
+    if (aStr > bStr) return desc ? -1 : 1;
+    return 0;
+  });
+}
+
 const FoundryTable = <T extends Record<string, any>>({
   columnConfig,
   data,
   rowIdField = 'id',
   defaultPagination = { pageIndex: 0, pageSize: 10 },
-  defaultSorting = [{ id: 'title', desc: false }],
   ActionsCell,
   customHeader,
   tableLayout = {
@@ -65,7 +146,6 @@ const FoundryTable = <T extends Record<string, any>>({
   },
 }: FoundryTableProps<T>) => {
   const [pagination, setPagination] = useState<PaginationState>(defaultPagination);
-  const [sorting, setSorting] = useState<SortingState>(defaultSorting);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(() => {
     const initial: VisibilityState = {};
     columnConfig.forEach((col) => {
@@ -74,16 +154,28 @@ const FoundryTable = <T extends Record<string, any>>({
     return initial;
   });
 
-  // New states for filtering
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  // Custom filter and sort state
+  const [customFilters, setCustomFilters] = useState<FilterCondition[]>([]);
+  const [customSort, setCustomSort] = useState<SortConfig | null>(null);
+
+  // Global search
   const [globalFilter, setGlobalFilter] = useState('');
+
+  // Extract all nested fields from the data (for sort/filter menus)
+  const allFields = useMemo<FieldInfo[]>(() => {
+    if (data.length === 0) return [];
+    const merged = data.reduce((acc, item) => ({ ...acc, ...item }), {});
+    const fields = getNestedFields(merged);
+    console.log('Extracted fields:', fields); // Debug
+    return fields;
+  }, [data]);
 
   // Build columns from config
   const columns = useMemo<ColumnDef<T>[]>(() => {
     return buildColumnsFromConfig(columnConfig, { ActionsCell, rowIdField }) as ColumnDef<T>[];
   }, [columnConfig, ActionsCell, rowIdField]);
 
-  // Compute visibleColumns object for header
+  // Compute visibleColumns for header
   const visibleColumnsObj = useMemo(() => {
     const obj: Record<string, boolean> = {};
     columnConfig.forEach((col) => {
@@ -96,48 +188,45 @@ const FoundryTable = <T extends Record<string, any>>({
     setColumnVisibility((prev) => ({ ...prev, [colId]: visible }));
   };
 
-  // Compute sortable and filterable columns (only data columns)
-  const sortableColumns = useMemo(() => {
-    return columnConfig
-      .filter(col => col.type === 'data')
-      .map(col => ({ id: col.id, header: col.header || col.id }));
-  }, [columnConfig]);
-
-  const filterableColumns = useMemo(() => {
-    return columnConfig
-      .filter(col => col.type === 'data')
-      .map(col => ({ id: col.id, header: col.header || col.id, dataType: 'string' }));
-  }, [columnConfig]);
+  // Process data: apply filters, then sorting
+  const processedData = useMemo(() => {
+    console.log('Applying filters:', customFilters);
+    console.log('Applying sort:', customSort);
+    let result = data;
+    if (customFilters.length > 0) {
+      result = filterData(result, customFilters);
+    }
+    if (customSort) {
+      result = sortData(result, customSort);
+    }
+    console.log('Processed data count:', result.length);
+    return result;
+  }, [data, customFilters, customSort]);
 
   const table = useReactTable({
     columns,
-    data, // original data, table handles filtering
+    data: processedData, // Use processed data
     enableColumnResizing: true,
     columnResizeMode: 'onChange',
-    pageCount: Math.ceil(data.length / pagination.pageSize),
+    pageCount: Math.ceil(processedData.length / pagination.pageSize),
     getRowId: (row: T) => row[rowIdField] || String(Math.random()),
     state: {
       pagination,
-      sorting,
       columnVisibility,
-      columnFilters,
       globalFilter,
     },
     onPaginationChange: setPagination,
-    onSortingChange: setSorting,
     onColumnVisibilityChange: setColumnVisibility,
-    onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+    // No sorting/filtering models – we handle them manually
   });
 
   return (
     <DataGrid
       table={table}
-      recordCount={table.getFilteredRowModel().rows.length}
+      recordCount={processedData.length}
       tableLayout={tableLayout}
     >
       <Card className="border-none">
@@ -146,13 +235,11 @@ const FoundryTable = <T extends Record<string, any>>({
             <FoundryTableHeader
               searchQuery={globalFilter}
               onSearchChange={setGlobalFilter}
-              filtersCount={columnFilters.length}
-              sorting={sorting}
-              onSortingChange={setSorting}
-              sortableColumns={sortableColumns}
-              columnFilters={columnFilters}
-              onColumnFiltersChange={setColumnFilters}
-              filterableColumns={filterableColumns}
+              fields={allFields}
+              customSort={customSort}
+              onSortChange={setCustomSort}
+              customFilters={customFilters}
+              onFiltersChange={setCustomFilters}
               visibleColumns={visibleColumnsObj}
               onColumnToggle={handleColumnToggle}
               onTabChange={(tab) => console.log('tab changed to', tab)}

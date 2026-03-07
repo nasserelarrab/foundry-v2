@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Sort, Filter, Columns } from '@/components/icons';
 import {
   Popover,
   PopoverContent,
@@ -9,10 +8,11 @@ import {
 } from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { SortingState, ColumnFiltersState } from '@tanstack/react-table';
+import { Search, ArrowUpDown, Filter, Columns2 } from 'lucide-react';
 import { SortPopover } from './SortPopover';
 import { FilterPopover } from './FilterPopover';
-import { Search, ArrowUpDown, Columns2 } from 'lucide-react'; // icons
+import { FieldInfo } from './getNestedFields'; // adjust import path as needed
+import { FilterCondition, SortConfig } from '../FoundryTable'; // adjust import
 
 interface FoundryTableHeaderProps {
   searchQuery?: string;
@@ -21,12 +21,12 @@ interface FoundryTableHeaderProps {
   onTabChange?: (tab: string) => void;
   visibleColumns?: { [key: string]: boolean };
   onColumnToggle?: (columnId: string, visible: boolean) => void;
-  sorting: SortingState;
-  onSortingChange: (sorting: SortingState) => void;
-  sortableColumns: Array<{ id: string; header: string }>;
-  columnFilters: ColumnFiltersState;
-  onColumnFiltersChange: (filters: ColumnFiltersState) => void;
-  filterableColumns: Array<{ id: string; header: string; dataType?: string }>;
+  // New props for dynamic sort/filter
+  fields: FieldInfo[];
+  customSort: SortConfig | null;
+  onSortChange: (sort: SortConfig | null) => void;
+  customFilters: FilterCondition[];
+  onFiltersChange: (filters: FilterCondition[]) => void;
 }
 
 const defaultTabs = ['All', 'Live', 'Drafts', 'Scheduled'];
@@ -38,12 +38,11 @@ export default function FoundryTableHeader({
   onTabChange,
   visibleColumns,
   onColumnToggle,
-  sorting,
-  onSortingChange,
-  sortableColumns,
-  columnFilters,
-  onColumnFiltersChange,
-  filterableColumns,
+  fields,
+  customSort,
+  onSortChange,
+  customFilters,
+  onFiltersChange,
 }: FoundryTableHeaderProps) {
   const [internalSearch, setInternalSearch] = useState(searchQuery);
   const [currentTab, setCurrentTab] = useState(activeTab || defaultTabs[0]);
@@ -104,33 +103,33 @@ export default function FoundryTableHeader({
         </div>
       </div>
 
-      {/* Right side buttons - pushed to the right */}
+      {/* Right side buttons */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: 'auto' }}>
-        {/* Sort button with popover */}
+        {/* Sort button */}
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" style={{ height: '28px', gap: '4px' }}>
-              <Sort size={14} />
+              <ArrowUpDown size={14} />
               <span>Sort</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="end">
             <SortPopover
-              sorting={sorting}
-              onSortingChange={onSortingChange}
-              columns={sortableColumns}
+              fields={fields}
+              currentSort={customSort}
+              onSortChange={onSortChange}
               onClose={() => {}} // optional
             />
           </PopoverContent>
         </Popover>
 
-        {/* Filters button with badge and popover */}
+        {/* Filters button */}
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" style={{ height: '28px', gap: '4px' }}>
               <Filter size={14} />
               <span>Filters</span>
-              {columnFilters.length > 0 && (
+              {customFilters.length > 0 && (
                 <span
                   style={{
                     background: '#2c2d30',
@@ -145,26 +144,26 @@ export default function FoundryTableHeader({
                     justifyContent: 'center',
                   }}
                 >
-                  {columnFilters.length}
+                  {customFilters.length}
                 </span>
               )}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="end">
             <FilterPopover
-              columnFilters={columnFilters}
-              onApply={onColumnFiltersChange}
-              columns={filterableColumns}
+              fields={fields}
+              filters={customFilters}
+              onApply={onFiltersChange}
               onClose={() => {}}
             />
           </PopoverContent>
         </Popover>
 
-        {/* Columns button with popover */}
+        {/* Columns button (unchanged) */}
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" style={{ height: '28px', padding: '7px 10px', background: 'black' }}>
-              <Columns size={14} className="text-white" />
+              <Columns2 size={14} className="text-white" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-56 p-3" align="end">
