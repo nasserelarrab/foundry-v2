@@ -8,20 +8,24 @@ import {
 } from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Search, ArrowUpDown, Columns2 } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { SortPopover } from './SortPopover';
 import { FilterPopover } from './FilterPopover';
-import { FieldInfo } from './getNestedFields'; // adjust import path as needed
-import { FilterCondition, SortConfig } from '../FoundryTable'; // adjust import
-import { Sort,Filter,Columns } from '@/components/icons';
+import { FieldInfo } from './getNestedFields';
+import { FilterCondition, SortConfig } from '../FoundryTable';
+import { Sort, Filter, Columns } from '@/components/icons';
+
 interface FoundryTableHeaderProps {
   searchQuery?: string;
   onSearchChange?: (value: string) => void;
-  activeTab?: string;
-  onTabChange?: (tab: string) => void;
+  // Tab props (now configurable)
+  tabs?: Array<{ label: string; value: string | null }>;
+  activeTabValue?: string | null;
+  onTabChange?: (value: string | null) => void;
+  // Column visibility
   visibleColumns?: { [key: string]: boolean };
   onColumnToggle?: (columnId: string, visible: boolean) => void;
-  // New props for dynamic sort/filter
+  // Sort/Filter props
   fields: FieldInfo[];
   customSort: SortConfig | null;
   onSortChange: (sort: SortConfig | null) => void;
@@ -29,12 +33,11 @@ interface FoundryTableHeaderProps {
   onFiltersChange: (filters: FilterCondition[]) => void;
 }
 
-const defaultTabs = ['All', 'Live', 'Drafts', 'Scheduled'];
-
 export default function FoundryTableHeader({
   searchQuery = '',
   onSearchChange,
-  activeTab,
+  tabs,
+  activeTabValue,
   onTabChange,
   visibleColumns,
   onColumnToggle,
@@ -45,16 +48,14 @@ export default function FoundryTableHeader({
   onFiltersChange,
 }: FoundryTableHeaderProps) {
   const [internalSearch, setInternalSearch] = useState(searchQuery);
-  const [currentTab, setCurrentTab] = useState(activeTab || defaultTabs[0]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInternalSearch(e.target.value);
     onSearchChange?.(e.target.value);
   };
 
-  const handleTabClick = (tab: string) => {
-    setCurrentTab(tab);
-    onTabChange?.(tab);
+  const handleTabClick = (value: string | null) => {
+    onTabChange?.(value);
   };
 
   return (
@@ -82,25 +83,28 @@ export default function FoundryTableHeader({
           />
         </div>
 
-        <div style={{ background: '#f4f4f4', borderRadius: '6px', display: 'flex', padding: '2px' }}>
-          {defaultTabs.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => handleTabClick(tab)}
-              style={{
-                padding: '4px 12px',
-                background: currentTab === tab ? '#fff' : 'transparent',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: currentTab === tab ? 500 : 400,
-              }}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
+        {/* Render tabs only if provided */}
+        {tabs && tabs.length > 0 && (
+          <div style={{ background: '#f4f4f4', borderRadius: '6px', display: 'flex', padding: '2px' }}>
+            {tabs.map((tab) => (
+              <button
+                key={tab.label}
+                onClick={() => handleTabClick(tab.value)}
+                style={{
+                  padding: '4px 12px',
+                  background: activeTabValue === tab.value ? '#fff' : 'transparent',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: activeTabValue === tab.value ? 500 : 400,
+                }}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Right side buttons */}
@@ -118,7 +122,7 @@ export default function FoundryTableHeader({
               fields={fields}
               currentSort={customSort}
               onSortChange={onSortChange}
-              onClose={() => {}} // optional
+              onClose={() => {}}
             />
           </PopoverContent>
         </Popover>
@@ -159,7 +163,7 @@ export default function FoundryTableHeader({
           </PopoverContent>
         </Popover>
 
-        {/* Columns button (unchanged) */}
+        {/* Columns button */}
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" style={{ height: '28px', padding: '7px 10px', background: 'black' }}>

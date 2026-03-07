@@ -23,12 +23,22 @@ import {
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import FoundryTableHeader from '@/components/foundry/foundry-table/FoundryTableHeader';
 import { getNestedFields, FieldInfo } from './getNestedFields';
-import { getValue } from './build-columns-from-config'; // or from a separate utils file
+import { getValue } from './build-columns-from-config';
 
 // Define filter condition and sort config types
 export interface FilterCondition {
   path: string;
-  operator: 'contains' | 'equals' | 'greaterThan' | 'lessThan';
+  operator:
+    | 'contains'
+    | 'doesNotContain'
+    | 'equals'
+    | 'notEquals'
+    | 'greaterThan'
+    | 'lessThan'
+    | 'isNull'
+    | 'isNotNull'
+    | 'isTrue'
+    | 'isFalse';
   value: string;
 }
 
@@ -38,6 +48,11 @@ export interface SortConfig {
 }
 
 export interface FoundryTableProps<T = any> {
+  // Tab filter configuration
+  tabConfig?: {
+    field: string;          // the field to filter on (e.g., 'status')
+    tabs: Array<{ label: string; value: string | null }>; // null for "All"
+  };
   columnConfig: ColumnConfig[];
   data: T[];
   rowIdField?: string;
@@ -65,7 +80,7 @@ function filterData<T>(data: T[], filters: FilterCondition[]): T[] {
       const val = getValue(item, cond.path);
       const filterVal = cond.value;
 
-      // Handle null/boolean operators first (they may not need filterVal)
+      // Handle null/boolean operators first
       switch (cond.operator) {
         case 'isNull':
           return val === null || val === undefined;
@@ -77,10 +92,8 @@ function filterData<T>(data: T[], filters: FilterCondition[]): T[] {
           return val === false;
       }
 
-      // For other operators, if val is null/undefined, it can't match (unless operator is isNull/isNotNull)
       if (val == null) return false;
 
-      // Now handle operators that require a value
       switch (cond.operator) {
         case 'contains':
           return String(val).toLowerCase().includes(filterVal.toLowerCase());
@@ -110,16 +123,13 @@ function sortData<T>(data: T[], sort: SortConfig | null): T[] {
   return [...data].sort((a, b) => {
     const aVal = getValue(a, path);
     const bVal = getValue(b, path);
-    
-    // Handle numbers
+
     if (typeof aVal === 'number' && typeof bVal === 'number') {
       return desc ? bVal - aVal : aVal - bVal;
     }
-    // Handle dates
     if (aVal instanceof Date && bVal instanceof Date) {
       return desc ? bVal.getTime() - aVal.getTime() : aVal.getTime() - bVal.getTime();
     }
-    // Handle strings (or fallback)
     const aStr = String(aVal ?? '').toLowerCase();
     const bStr = String(bVal ?? '').toLowerCase();
     if (aStr < bStr) return desc ? 1 : -1;
@@ -144,6 +154,7 @@ const FoundryTable = <T extends Record<string, any>>({
     headerBorder: false,
     headerBackground: false,
   },
+  tabConfig,
 }: FoundryTableProps<T>) => {
   const [pagination, setPagination] = useState<PaginationState>(defaultPagination);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(() => {
@@ -154,23 +165,19 @@ const FoundryTable = <T extends Record<string, any>>({
     return initial;
   });
 
-  // Custom filter and sort state
   const [customFilters, setCustomFilters] = useState<FilterCondition[]>([]);
   const [customSort, setCustomSort] = useState<SortConfig | null>({
-      path: 'id', // replace with a field that always exists
-      desc: false,
+    path: 'id', // fallback field
+    desc: false,
   });
-
-  // Global search
+  const [activeTabValue, setActiveTabValue] = useState<string | null>(null);
   const [globalFilter, setGlobalFilter] = useState('');
 
-  // Extract all nested fields from the data (for sort/filter menus)
+  // Extract all nested fields for sort/filter menus
   const allFields = useMemo<FieldInfo[]>(() => {
     if (data.length === 0) return [];
     const merged = data.reduce((acc, item) => ({ ...acc, ...item }), {});
-    const fields = getNestedFields(merged);
-    console.log('Extracted fields:', fields); // Debug
-    return fields;
+    return getNestedFields(merged);
   }, [data]);
 
   // Build columns from config
@@ -191,24 +198,33 @@ const FoundryTable = <T extends Record<string, any>>({
     setColumnVisibility((prev) => ({ ...prev, [colId]: visible }));
   };
 
-  // Process data: apply filters, then sorting
+  // Process data: apply filters → tab filter → sorting
   const processedData = useMemo(() => {
-    console.log('Applying filters:', customFilters);
-    console.log('Applying sort:', customSort);
     let result = data;
+
     if (customFilters.length > 0) {
       result = filterData(result, customFilters);
     }
+
+    if (activeTabValue !== null && tabConfig) {
+      const field = tabConfig.field;
+      result = result.filter(item => {
+        const val = getValue(item, field);
+        if (val == null) return false;
+        return String(val).trim().toLowerCase() === String(activeTabValue).trim().toLowerCase();
+      });
+    }
+
     if (customSort) {
       result = sortData(result, customSort);
     }
-    console.log('Processed data count:', result.length);
+
     return result;
-  }, [data, customFilters, customSort]);
+  }, [data, customFilters, customSort, activeTabValue, tabConfig]);
 
   const table = useReactTable({
     columns,
-    data: processedData, // Use processed data
+    data: processedData,
     enableColumnResizing: true,
     columnResizeMode: 'onChange',
     pageCount: Math.ceil(processedData.length / pagination.pageSize),
@@ -223,15 +239,10 @@ const FoundryTable = <T extends Record<string, any>>({
     onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    // No sorting/filtering models – we handle them manually
   });
 
   return (
-    <DataGrid
-      table={table}
-      recordCount={processedData.length}
-      tableLayout={tableLayout}
-    >
+    <DataGrid table={table} recordCount={processedData.length} tableLayout={tableLayout}>
       <Card className="border-none">
         <CardHeaderFoundry>
           {customHeader || (
@@ -245,7 +256,10 @@ const FoundryTable = <T extends Record<string, any>>({
               onFiltersChange={setCustomFilters}
               visibleColumns={visibleColumnsObj}
               onColumnToggle={handleColumnToggle}
-              onTabChange={(tab) => console.log('tab changed to', tab)}
+              // Tab props
+              tabs={tabConfig?.tabs}
+              activeTabValue={activeTabValue}
+              onTabChange={setActiveTabValue}
             />
           )}
         </CardHeaderFoundry>

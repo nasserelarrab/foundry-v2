@@ -78,3 +78,13 @@ export const PAGES_LIST_CONFIG: ColumnConfig[] = [
     fields: []
   },
 ];
+
+export const PAGE_TABS = {
+  field: 'seo.label',
+  tabs: [
+    { label: 'All', value: null },
+    { label: 'good', value: 'GOOD' },
+    { label: 'bad', value: 'BAD' },
+    { label: 'ok', value: 'OK' },
+  ],
+};

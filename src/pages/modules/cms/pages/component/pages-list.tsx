@@ -15,7 +15,7 @@ import {
 import { EllipsisVertical } from 'lucide-react';
 import { Row } from '@tanstack/react-table';
 import { FoundryTable } from '@/components/foundry/foundry-table/foundry-table';
-import { PAGES_LIST_CONFIG } from '../config/pages-list-table.config';
+import { PAGE_TABS, PAGES_LIST_CONFIG } from '../config/pages-list-table.config';
 import { date } from 'zod';
 
 // The PagesList component is now configurable via props. You can supply
@@ -227,6 +227,7 @@ const PagesList = ({ columnConfig = PAGES_LIST_CONFIG, dataOverride }: PagesList
   return (
     <FoundryTable<IData>
       columnConfig={columnConfig}
+      tabConfig={PAGE_TABS}
       data={flattenedData}
       ActionsCell={ActionsCell}
       showCheckbox={false}
