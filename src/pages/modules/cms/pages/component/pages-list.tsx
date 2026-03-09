@@ -5,6 +5,9 @@ import { toast } from 'sonner';
 import { useCopyToClipboard } from '@/hooks/use-copy-to-clipboard';
 import { Alert, AlertIcon, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { useEffect } from 'react';
+import { useLayout } from '@/layouts/layout-16/components/context'; // adjust path if needed
+import { Plus, FileText, Download } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +19,6 @@ import { EllipsisVertical } from 'lucide-react';
 import { Row } from '@tanstack/react-table';
 import { FoundryTable } from '@/components/foundry/foundry-table/foundry-table';
 import { PAGE_TABS, PAGES_LIST_CONFIG } from '../config/pages-list-table.config';
-import { date } from 'zod';
 
 // The PagesList component is now configurable via props. You can supply
 // a `columnConfig` array (see `src/config/column-config.ts` for shape) and
@@ -46,7 +48,7 @@ interface IData {
   status: string;
   seo: { label: string; score: number; example: string };
   updated: { user: string; time: string; avatar?: string };
-  publication: {status:string;date:Date};
+  publication: { status: string; date: Date };
   blocks?: number;
   child?: IData[];
 }
@@ -61,11 +63,11 @@ const getRandomAvatar = (): string => {
 // Helper function to flatten nested data with children
 const flattenData = (items: IData[]): IData[] => {
   const flattened: IData[] = [];
-  
+
   items.forEach(item => {
     // Add the parent item
     flattened.push(item);
-    
+
     // Add all children immediately after the parent if they exist
     if (item.child && Array.isArray(item.child)) {
       item.child.forEach(child => {
@@ -88,7 +90,7 @@ const data: IData[] = [
     status: 'Published',
     seo: { label: 'GOOD', score: 92, example: '"Modern Furniture"' },
     updated: { user: 'Ahmed', time: '2 hours ago', avatar: getRandomAvatar() },
-    publication: {status:'Published',date:new Date()},
+    publication: { status: 'Published', date: new Date() },
     blocks: 12,
   },
   {
@@ -100,21 +102,23 @@ const data: IData[] = [
     status: 'Published',
     seo: { label: 'GOOD', score: 85, example: '"Our Story"' },
     updated: { user: 'Sarah K.', time: '5 hours ago', avatar: getRandomAvatar() },
-    publication: {status:'Published',date:new Date()},
+    publication: { status: 'Published', date: new Date() },
     blocks: 5,
-    child:[  {
-                id: '8',
-                parentId: '2',
-                title: 'Landing1',
-                path: '/summer-collection/landing',
-                lang: 'EN',
-                type: 'Landing',
-                status: 'Scheduled',
-                seo: { label: 'BAD', score: 45, example: '' },
-                updated: { user: 'Layla M.', time: '3 hours ago', avatar: getRandomAvatar() },
-                publication: {status:'Scheduled',date:new Date()},
-                blocks: 7,
-              },]
+    child: [
+      {
+        id: '8',
+        parentId: '2',
+        title: 'Landing1',
+        path: '/summer-collection/landing',
+        lang: 'EN',
+        type: 'Landing',
+        status: 'Scheduled',
+        seo: { label: 'BAD', score: 45, example: '' },
+        updated: { user: 'Layla M.', time: '3 hours ago', avatar: getRandomAvatar() },
+        publication: { status: 'Scheduled', date: new Date() },
+        blocks: 7,
+      },
+    ],
   },
   {
     id: '3',
@@ -125,10 +129,9 @@ const data: IData[] = [
     status: 'Scheduled',
     seo: { label: 'BAD', score: 45, example: '"Summer Trends"' },
     updated: { user: 'Ahmed', time: '2 days ago', avatar: getRandomAvatar() },
-    publication: {status:'Scheduled',date:new Date()},
+    publication: { status: 'Scheduled', date: new Date() },
     blocks: 3,
   },
-
   {
     id: '4',
     title: 'About Us - عن نحن',
@@ -138,7 +141,7 @@ const data: IData[] = [
     status: 'Draft',
     seo: { label: 'BAD', score: 12, example: '"عن نهم"' },
     updated: { user: 'Layla M.', time: '3 hours ago', avatar: getRandomAvatar() },
-    publication: {status:'Draft',date:new Date()},
+    publication: { status: 'Draft', date: new Date() },
     blocks: 2,
   },
   {
@@ -150,9 +153,10 @@ const data: IData[] = [
     status: 'Published',
     seo: { label: 'OK', score: 78, example: '"Management Team"' },
     updated: { user: 'Sarah K.', time: '1 week ago', avatar: getRandomAvatar() },
-    publication: {status:'Published',date:new Date()},
+    publication: { status: 'Published', date: new Date() },
     blocks: 8,
-     child:[  {
+    child: [
+      {
         id: '12',
         parentId: '5',
         title: 'Landing',
@@ -162,9 +166,10 @@ const data: IData[] = [
         status: 'Scheduled',
         seo: { label: 'BAD', score: 45, example: '' },
         updated: { user: 'Layla M.', time: '3 hours ago', avatar: getRandomAvatar() },
-        publication: {status:'Scheduled',date:new Date()},
+        publication: { status: 'Scheduled', date: new Date() },
         blocks: 4,
-      },]
+      },
+    ],
   },
   // additional rows can be added here for testing
 ];
@@ -175,7 +180,7 @@ function ActionsCell({ row }: { row: Row<IData> }) {
     copyToClipboard(String(row.original.id));
     const message = `Member ID successfully copied: ${row.original.id}`;
     toast.custom(
-      (t) => (
+      t => (
         <Alert
           variant="mono"
           icon="success"
@@ -220,9 +225,49 @@ interface PagesListProps {
 }
 
 const PagesList = ({ columnConfig = PAGES_LIST_CONFIG, dataOverride }: PagesListProps) => {
+  const { setToolbarContent, isMobile } = useLayout();
   const sourceData = dataOverride || data;
-  // Flatten the data to include child rows
   const flattenedData = flattenData(sourceData);
+
+  // Handlers for toolbar buttons
+  const handleMobileAction = () => {
+    console.log('Mobile action');
+  };
+  const handleAdd = () => {
+    console.log('Add clicked');
+  };
+  const handleDownload = () => {
+    console.log('Download clicked');
+  };
+
+  useEffect(() => {
+    // Build custom buttons based on screen size
+    const customButtons = isMobile ? (
+      <>
+        <Button variant="outline" mode="icon" onClick={handleMobileAction}>
+          <FileText />
+        </Button>
+        <Button variant="mono" mode="icon" onClick={handleAdd}>
+          <Plus />
+        </Button>
+      </>
+    ) : (
+      <>
+        <Button variant="outline" onClick={handleDownload}>
+          <Download /> Export
+        </Button>
+        <Button variant="mono" onClick={handleAdd}>
+          <Plus /> New Item
+        </Button>
+      </>
+    );
+
+    // Set the toolbar content
+    setToolbarContent(customButtons);
+
+    // Clean up: reset to default when this component unmounts
+    return () => setToolbarContent(null);
+  }, [setToolbarContent, isMobile]);
 
   return (
     <FoundryTable<IData>

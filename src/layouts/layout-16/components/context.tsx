@@ -1,3 +1,4 @@
+// context.tsx (updated)
 import {
   createContext,
   ReactNode,
@@ -24,6 +25,9 @@ interface LayoutState {
   sidebarToggle: () => void;
   activeModuleId?: string;
   setActiveModuleId: (id: string | undefined) => void;
+  // Add these two lines
+  toolbarContent: ReactNode | null;
+  setToolbarContent: (content: ReactNode | null) => void;
 }
 
 // Create the context
@@ -46,6 +50,9 @@ export function LayoutProvider({ children, style: customStyle, bodyClassName = '
     return m?.id || 'cms';
   });
 
+  // 👇 New state for toolbar content
+  const [toolbarContent, setToolbarContent] = useState<ReactNode | null>(null);
+
   const defaultStyle: React.CSSProperties = {
     '--sidebar-width': SIDEBAR_WIDTH,
     '--sidebar-collapsed-width': SIDEBAR_COLLAPSED_WIDTH,
@@ -66,11 +73,7 @@ export function LayoutProvider({ children, style: customStyle, bodyClassName = '
     if (bodyClassName) {
       const body = document.body;
       const existingClasses = body.className;
-
-      // Add new classes
       body.className = `${existingClasses} ${bodyClassName}`.trim();
-
-      // Cleanup function to remove classes on unmount
       return () => {
         body.className = existingClasses;
       };
@@ -78,9 +81,6 @@ export function LayoutProvider({ children, style: customStyle, bodyClassName = '
   }, [bodyClassName]);
 
   useEffect(() => {
-    // each time the location changes we try to resolve a module;
-    // if none matches (e.g. root path) we fall back to CMS so a menu
-    // is always shown on initial render
     console.log('pathname changed:', pathname);
     const moduleByPath = getLayout16ModuleByPath(pathname);
     console.log('moduleByPath:', moduleByPath);
@@ -97,6 +97,9 @@ export function LayoutProvider({ children, style: customStyle, bodyClassName = '
         sidebarToggle,
         activeModuleId,
         setActiveModuleId,
+        // 👇 Expose the new state and setter
+        toolbarContent,
+        setToolbarContent,
       }}
     >
       <div
