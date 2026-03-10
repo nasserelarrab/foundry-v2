@@ -19,9 +19,9 @@ export function HeaderToolbar() {
   return (
     <nav className="flex items-center gap-2.5">
       {/* Always present – left icons */}
-      <Button mode="icon" variant="outline"><Coffee /></Button>
+      {/* <Button mode="icon" variant="outline"><Coffee /></Button>
       <Button mode="icon" variant="outline"><MessageSquareCode /></Button>
-      <Button mode="icon" variant="outline"><Pin /></Button>
+      <Button mode="icon" variant="outline"><Pin /></Button> */}
 
       {/* Search – always present on non-mobile */}
       {/* {!isMobile && (

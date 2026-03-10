@@ -7,7 +7,8 @@ import { Alert, AlertIcon, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { useEffect } from 'react';
 import { useLayout } from '@/layouts/layout-16/components/context'; // adjust path if needed
-import { Plus, FileText, Download } from 'lucide-react';
+import { Plus,Search,ClipboardList,Coffee,MessageSquareCode,Pin, FileText, Download } from 'lucide-react';
+import { Input, InputWrapper } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -239,26 +240,32 @@ const PagesList = ({ columnConfig = PAGES_LIST_CONFIG, dataOverride }: PagesList
   const handleDownload = () => {
     console.log('Download clicked');
   };
-
+  const handleInputChange = () => {};
   useEffect(() => {
     // Build custom buttons based on screen size
     const customButtons = isMobile ? (
       <>
-        <Button variant="outline" mode="icon" onClick={handleMobileAction}>
+        {/* <Button variant="outline" mode="icon" onClick={handleMobileAction}>
           <FileText />
         </Button>
         <Button variant="mono" mode="icon" onClick={handleAdd}>
           <Plus />
-        </Button>
+        </Button> */}
       </>
     ) : (
       <>
-        <Button variant="outline" onClick={handleDownload}>
-          <Download /> Export
+      {/* <Button variant="mono"><Plus /> Add</Button> */}
+      <InputWrapper className="w-full lg:w-40">
+          <Search />
+          <Input type="search" placeholder="Search" onChange={handleInputChange} />
+        </InputWrapper>
+        <Button variant="mono" onClick={handleDownload}>
+          <Plus /> Quick Draft
         </Button>
-        <Button variant="mono" onClick={handleAdd}>
-          <Plus /> New Item
-        </Button>
+        <>
+        {/* <Button variant="outline" mode="icon"><ClipboardList /></Button> */}
+        <Button variant="mono" ><Plus /> Add</Button>
+      </>
       </>
     );
 
