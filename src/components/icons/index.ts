@@ -7,12 +7,14 @@ import AddressBook from './address-book.svg?react';
 import BurgerMenu from './burger-menu.svg?react';
 import CalendarAdd from './calendar-add.svg?react';
 import ChartLineStar from './chart-line-star.svg?react';
+import Columns from './columns.svg?react';
 import Data from './data.svg?react';
 import Delivery2 from './delivery-2.svg?react';
 import Document from './document.svg?react';
 import Element7 from './element-7.svg?react';
 import Element12 from './element-12.svg?react';
 import ElementEqual from './element-equal.svg?react';
+import Filter from './filter.svg?react';
 import Folder from './folder.svg?react';
 import Frame from './Frame.svg?react';
 import GamerCards from './gamer-cards.svg?react';
@@ -31,14 +33,12 @@ import Rocket from './rocket.svg?react';
 import Save2 from './save-2.svg?react';
 import Setting2 from './setting-2.svg?react';
 import Shop from './shop.svg?react';
+import Sort from './sort.svg?react';
 import StatusOnline from './Status-Online.svg?react';
 import TabletTextDown from './tablet-text-down.svg?react';
 import Technology4 from './technology-4.svg?react';
 import TextCircle from './text-circle.svg?react';
 import Up from './up.svg?react';
-import Sort from './sort.svg?react';
-import Filter from './filter.svg?react';
-import Columns from './columns.svg?react';
 
 export {
   Sort,

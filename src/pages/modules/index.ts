@@ -29,3 +29,5 @@ export * from './marketing/marketing1/marketing1-page';
 
 export * from './pm/pm-page';
 export * from './pm/pm1/pm1-page';
+
+export * from './user-management/UsersPage';

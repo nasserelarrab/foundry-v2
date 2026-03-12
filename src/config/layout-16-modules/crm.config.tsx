@@ -1,12 +1,11 @@
-import { AddressBook } from '@/components/icons';
+import { BookUser, Contact, Folder, Sparkles, Users } from 'lucide-react';
 import type { Layout16ModuleConfig } from './types';
-import { Sparkles, Folder, Users, Contact } from 'lucide-react';
 
 export const CRM_MODULE: Layout16ModuleConfig = {
   id: 'crm',
   title: 'CRM',
   tooltip: 'CRM',
-  icon: AddressBook,
+  icon: BookUser,
   path: '/layout-16/modules/crm',
   rootPath: '/layout-16/modules/crm',
   enabled: true,

@@ -1,11 +1,11 @@
+import { Folder, Settings, Sparkles, Users } from 'lucide-react';
 import { CalendarAdd } from '@/components/icons';
 import type { Layout16ModuleConfig } from './types';
-import { Folder, Users, Sparkles, Settings } from 'lucide-react';
 
 export const CALENDAR_MODULE: Layout16ModuleConfig = {
   id: 'calendar',
   title: 'Calendar',
-  tooltip: 'Calinder',
+  tooltip: 'Calender',
   icon: CalendarAdd,
   path: '/layout-16/modules/calendar',
   rootPath: '/layout-16/modules/calendar',

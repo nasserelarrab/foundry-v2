@@ -1,15 +1,17 @@
 import { Fragment } from 'react';
-import { Container } from '@/components/common/container';
 import {
   Toolbar,
   ToolbarHeading,
 } from '@/layouts/layout-16/components/toolbar';
+import { Container } from '@/components/common/container';
 
 interface Layout16ModuleBlankPageProps {
   title: string;
 }
 
-export function Layout16ModuleBlankPage({ title }: Layout16ModuleBlankPageProps) {
+export function Layout16ModuleBlankPage({
+  title,
+}: Layout16ModuleBlankPageProps) {
   return (
     <Fragment>
       <Container>
